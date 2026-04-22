@@ -1,0 +1,74 @@
+@use '../../styles/variables' as *;
+
+.card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow-card;
+  transition: all $transition;
+
+  &:hover { border-color: $border-light; transform: translateY(-1px); }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.sub {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+// Color variants
+.accent {
+  .icon { background: $accent-soft; color: $accent; }
+  .value { color: $accent; }
+}
+.green {
+  .icon { background: $green-soft; color: $green; }
+  .value { color: $green; }
+  border-color: rgba(14, 203, 129, 0.2);
+}
+.red {
+  .icon { background: $red-soft; color: $red; }
+  .value { color: $red; }
+  border-color: rgba(240, 62, 62, 0.2);
+}
+.orange {
+  .icon { background: $orange-soft; color: $orange; }
+  .value { color: $orange; }
+  border-color: rgba(255, 146, 43, 0.2);
+}
+.blue {
+  .icon { background: $blue-soft; color: $blue; }
+  .value { color: $blue; }
+  border-color: rgba(77, 171, 247, 0.2);
+}

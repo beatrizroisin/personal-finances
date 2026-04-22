@@ -1,0 +1,283 @@
+@use '../../styles/variables' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: $bg-base;
+  position: relative;
+  overflow: hidden;
+}
+
+// ─── BACKGROUND ORBS ─────────────────────────────────────────────────────────
+.orb1 {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 70%);
+  top: -150px;
+  left: -100px;
+  pointer-events: none;
+}
+
+.orb2 {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,203,129,0.07) 0%, transparent 70%);
+  bottom: -100px;
+  right: -80px;
+  pointer-events: none;
+}
+
+// ─── CARD ────────────────────────────────────────────────────────────────────
+.card {
+  background: $bg-surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-xl;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(124,92,252,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ─── LOGO ─────────────────────────────────────────────────────────────────────
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.logoIcon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, $accent, #4f46e5);
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(124,92,252,0.35);
+  flex-shrink: 0;
+}
+
+.logoTitle {
+  font-family: $font-display;
+  font-size: 22px;
+  font-weight: 700;
+  color: $text-primary;
+  line-height: 1.1;
+}
+
+.logoSub {
+  font-size: 12px;
+  color: $text-muted;
+  margin-top: 3px;
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 0;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: $font-body;
+  color: $text-muted;
+  transition: all $transition;
+  cursor: pointer;
+
+  &:hover { color: $text-primary; }
+}
+
+.tabActive {
+  background: $accent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(124,92,252,0.3);
+}
+
+// ─── FORM ────────────────────────────────────────────────────────────────────
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-muted;
+  }
+
+  input {
+    width: 100%;
+    background: $bg-base;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 12px 14px;
+    color: $text-primary;
+    font-family: $font-body;
+    font-size: 14px;
+    outline: none;
+    transition: border-color $transition, box-shadow $transition;
+
+    &:focus {
+      border-color: $accent;
+      box-shadow: 0 0 0 3px $accent-soft;
+    }
+
+    &::placeholder { color: $text-muted; }
+  }
+}
+
+.passWrap {
+  position: relative;
+
+  input { padding-right: 44px; }
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: color $transition;
+
+  &:hover { color: $text-primary; }
+}
+
+// ─── MESSAGES ────────────────────────────────────────────────────────────────
+.msgError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: $red-soft;
+  border: 1px solid rgba(240,62,62,0.25);
+  border-radius: $radius-sm;
+  color: $red;
+  font-size: 13px;
+  animation: fadeUp 0.2s ease;
+}
+
+.msgSuccess {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: $green-soft;
+  border: 1px solid rgba(14,203,129,0.25);
+  border-radius: $radius-sm;
+  color: $green;
+  font-size: 13px;
+  animation: fadeUp 0.2s ease;
+}
+
+// ─── SUBMIT BTN ───────────────────────────────────────────────────────────────
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, $accent, #4f46e5);
+  border: none;
+  border-radius: $radius-sm;
+  color: white;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all $transition;
+  margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(124,92,252,0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(124,92,252,0.4);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ─── SPINNER ─────────────────────────────────────────────────────────────────
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── FEATURES ────────────────────────────────────────────────────────────────
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid $border;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $accent;
+  flex-shrink: 0;
+}

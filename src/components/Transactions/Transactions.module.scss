@@ -1,0 +1,162 @@
+@use '../../styles/variables' as *;
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 6px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 4px;
+}
+
+.filterBtn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  transition: all $transition;
+
+  &:hover { color: $text-primary; }
+}
+
+.filterBtnActive {
+  background: $accent;
+  color: white;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: $text-muted;
+
+  strong { font-size: 15px; font-weight: 700; }
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 36px;
+  background: $border;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  transition: all $transition;
+
+  &:hover {
+    border-color: $border-light;
+    background: $bg-card-hover;
+  }
+}
+
+.itemIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.itemInfo { flex: 1; min-width: 0; }
+
+.itemDesc {
+  font-size: 14px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cardTag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid;
+  background: transparent;
+}
+
+.itemDate {
+  font-size: 11px;
+  color: $text-muted;
+}
+
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.itemAmount {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+// Modal
+.typeSwitch {
+  display: flex;
+  gap: 8px;
+}
+
+.typeSwitchBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: $radius-sm;
+  font-size: 13px;
+  font-weight: 600;
+  background: $bg-base;
+  border: 1px solid $border;
+  color: $text-muted;
+  transition: all $transition;
+
+  &:hover { color: $text-primary; }
+}
+
+.typeSwitchActive { }

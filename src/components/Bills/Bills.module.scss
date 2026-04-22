@@ -1,0 +1,137 @@
+@use '../../styles/variables' as *;
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+
+  @media (max-width: 500px) { grid-template-columns: 1fr; }
+}
+
+.summaryBlock {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.summaryValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.progressWrap {
+  margin-bottom: 24px;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: $text-muted;
+  margin-bottom: 6px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  transition: all $transition;
+
+  &:hover { border-color: $border-light; }
+}
+
+.checkBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all $transition;
+  cursor: pointer;
+
+  &:hover { opacity: 0.8; }
+}
+
+.itemInfo { flex: 1; min-width: 0; }
+
+.itemDesc {
+  font-size: 14px;
+  font-weight: 500;
+  color: $text-primary;
+  margin-bottom: 5px;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dueDay {
+  font-size: 11px;
+  color: $text-muted;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: 100px;
+  padding: 1px 8px;
+}
+
+.recurring {
+  font-size: 11px;
+  color: $accent;
+}
+
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.statusTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-primary;
+  min-width: 80px;
+  text-align: right;
+}

@@ -1,0 +1,378 @@
+@use '../../styles/variables' as *;
+
+.pageSubtitle {
+  font-size: 13px;
+  color: $text-muted;
+  margin-top: 4px;
+}
+
+// ─── OVERVIEW CHART ──────────────────────────────────────────────────────────
+.chartCard { margin-bottom: 24px; }
+
+.chartNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.chartTitle {
+  font-family: $font-display;
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.navBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-sm;
+  background: $bg-base;
+  border: 1px solid $border;
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover:not(:disabled) {
+    background: $accent-soft;
+    border-color: rgba(124,92,252,0.3);
+    color: $accent;
+  }
+
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.monthPills {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-body;
+  background: $bg-base;
+  border: 1px solid $border;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover { border-color: $border-light; color: $text-primary; }
+}
+
+.pillActive {
+  background: $accent;
+  border-color: $accent;
+  color: white;
+  box-shadow: 0 2px 8px rgba(124,92,252,0.3);
+}
+
+.pillCurrent {
+  &:not(.pillActive) {
+    border-color: rgba(124,92,252,0.4);
+    color: $accent;
+  }
+}
+
+// ─── DETAIL HEADER ────────────────────────────────────────────────────────────
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detailTitle {
+  font-family: $font-display;
+  font-size: 24px;
+  font-weight: 700;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.currentTag {
+  font-family: $font-body;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: $accent-soft;
+  border: 1px solid rgba(124,92,252,0.3);
+  color: $accent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// ─── SUMMARY ROW ─────────────────────────────────────────────────────────────
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.summaryCard {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all $transition;
+  &:hover { transform: translateY(-1px); }
+}
+
+.summaryCardBold {
+  border-width: 1px;
+}
+
+.summaryIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.summaryValue {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+// ─── DETAIL GRID ─────────────────────────────────────────────────────────────
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detailCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detailCard { padding: 18px !important; }
+
+// ─── SECTION HEADER ──────────────────────────────────────────────────────────
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.sectionIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  flex: 1;
+}
+
+.sectionCount {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 100px;
+  background: $bg-base;
+  border: 1px solid $border;
+  color: $text-muted;
+}
+
+.sectionTotal {
+  font-size: 14px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+// ─── ITEM ROW ────────────────────────────────────────────────────────────────
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid $border;
+  transition: background $transition;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-base; }
+}
+
+.itemRowPaid {
+  opacity: 0.55;
+}
+
+.itemInfo { flex: 1; min-width: 0; }
+
+.itemDesc {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1px;
+}
+
+.itemSub {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: $text-muted;
+}
+
+.paidTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  background: $green-soft;
+  color: $green;
+  flex-shrink: 0;
+}
+
+.itemAmount {
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sectionFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid $border;
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.emptyMsg {
+  font-size: 13px;
+  color: $text-muted;
+  text-align: center;
+  padding: 16px 0;
+  font-style: italic;
+}
+
+// ─── EMPTY FUTURE ────────────────────────────────────────────────────────────
+.emptyFuture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+  color: $text-muted;
+}
+
+.emptyFutureTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: 6px;
+}
+
+.emptyFutureDesc {
+  font-size: 12px;
+  color: $text-muted;
+  max-width: 240px;
+}
+
+// ─── BALANCE EXPLANATION ─────────────────────────────────────────────────────
+.balanceExplain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.balanceExplainLeft { flex: 1; min-width: 200px; }
+
+.balanceExplainLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+  margin-bottom: 6px;
+}
+
+.balanceExplainFormula {
+  font-size: 12px;
+  color: $text-secondary;
+  line-height: 1.7;
+}
+
+.balanceExplainRight {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+// ─── TOOLTIP ─────────────────────────────────────────────────────────────────
+.tooltip {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  box-shadow: $shadow-card;
+}
+
+.tooltipLabel {
+  font-size: 11px;
+  color: $text-muted;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}

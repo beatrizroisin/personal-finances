@@ -1,0 +1,59 @@
+// ─── COLOR PALETTE ───────────────────────────────────────────────────────────
+$bg-base:        #08080f;
+$bg-surface:     #0f0f1e;
+$bg-card:        #13132a;
+$bg-card-hover:  #18183a;
+$border:         #1e1e3f;
+$border-light:   #2a2a5a;
+
+$accent:         #7c5cfc;
+$accent-soft:    rgba(124, 92, 252, 0.15);
+$accent-glow:    rgba(124, 92, 252, 0.25);
+
+$green:          #0ecb81;
+$green-soft:     rgba(14, 203, 129, 0.12);
+$red:            #f03e3e;
+$red-soft:       rgba(240, 62, 62, 0.12);
+$orange:         #ff922b;
+$orange-soft:    rgba(255, 146, 43, 0.12);
+$blue:           #4dabf7;
+$blue-soft:      rgba(77, 171, 247, 0.12);
+$pink:           #f06595;
+$yellow:         #ffd43b;
+$teal:           #20c997;
+$purple:         #cc5de8;
+
+$text-primary:   #f0f0ff;
+$text-secondary: #8888bb;
+$text-muted:     #55557a;
+
+// ─── TYPOGRAPHY ───────────────────────────────────────────────────────────────
+$font-display: 'Cormorant Garamond', serif;
+$font-body:    'Syne', sans-serif;
+
+// ─── SPACING ─────────────────────────────────────────────────────────────────
+$radius-sm:  8px;
+$radius-md:  14px;
+$radius-lg:  20px;
+$radius-xl:  28px;
+
+// ─── TRANSITIONS ─────────────────────────────────────────────────────────────
+$transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── SHADOWS ─────────────────────────────────────────────────────────────────
+$shadow-card:  0 4px 24px rgba(0, 0, 0, 0.4);
+$shadow-glow:  0 0 30px rgba(124, 92, 252, 0.15);
+$shadow-green: 0 0 20px rgba(14, 203, 129, 0.1);
+
+// ─── CARD COLORS ─────────────────────────────────────────────────────────────
+$card-colors: (
+  'nubank':    #820ad1,
+  'itau':      #ec7000,
+  'bradesco':  #cc0000,
+  'inter':     #ff6600,
+  'xp':        #111111,
+  'c6':        #2c2c2c,
+  'sicoob':    #008542,
+  'outro':     #7c5cfc
+);

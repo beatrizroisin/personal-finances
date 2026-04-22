@@ -1,0 +1,169 @@
+@use '../../styles/variables' as *;
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+
+  @media (max-width: 500px) { grid-template-columns: 1fr; }
+}
+
+.summaryBlock {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.summaryValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.instCard {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: $shadow-card;
+  transition: all $transition;
+
+  &:hover { border-color: $border-light; transform: translateY(-2px); }
+}
+
+.instHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.instIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.instTitle { flex: 1; min-width: 0; }
+
+.instDesc {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 3px;
+}
+
+.instCard2 {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.instProgress { }
+
+.instProgressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: $text-muted;
+  margin-bottom: 6px;
+}
+
+.instValues {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.instValLabel {
+  font-size: 11px;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.instValBig {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+  line-height: 1.1;
+}
+
+.instValSub {
+  font-size: 11px;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.payBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: $radius-sm;
+  background: $accent-soft;
+  border: 1px solid rgba(124, 92, 252, 0.3);
+  color: $accent;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: $font-body;
+  transition: all $transition;
+  cursor: pointer;
+
+  &:hover { background: $accent; color: white; }
+}
+
+.doneTag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: $radius-sm;
+  background: $green-soft;
+  color: $green;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.calcPreview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: $accent-soft;
+  border: 1px solid rgba(124, 92, 252, 0.2);
+  border-radius: $radius-sm;
+  font-size: 13px;
+  color: $text-secondary;
+  margin-bottom: 4px;
+
+  strong { color: $accent; font-size: 16px; }
+}

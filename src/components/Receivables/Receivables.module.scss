@@ -1,0 +1,591 @@
+@use '../../styles/variables' as *;
+
+// ─── HEADER ───────────────────────────────────────────────────────────────────
+.addBtnGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+// ─── SUMMARY ─────────────────────────────────────────────────────────────────
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summaryBlock {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all $transition;
+  &:hover { transform: translateY(-1px); }
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.summaryValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 4px;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  transition: all $transition;
+  &:hover { color: $text-primary; }
+}
+
+.filterBtnActive {
+  background: $accent;
+  color: white;
+}
+
+// ─── RECEIVABLE CARD ─────────────────────────────────────────────────────────
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recCard {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: $shadow-card;
+  transition: all $transition;
+
+  &:hover { border-color: $border-light; }
+}
+
+.recCardDone {
+  opacity: 0.7;
+  border-color: rgba(14, 203, 129, 0.2) !important;
+}
+
+// ─── CARD HEADER ─────────────────────────────────────────────────────────────
+.recHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.recIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recMeta { flex: 1; min-width: 0; }
+
+.recTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.recDesc {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.recType {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.recPerson {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.splitSummary {
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: $text-muted;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: 100px;
+  padding: 1px 8px;
+}
+
+.pix {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: $green;
+  background: $green-soft;
+  border: 1px solid rgba(14, 203, 129, 0.2);
+  border-radius: 100px;
+  padding: 1px 8px;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover { background: $green; color: white; }
+}
+
+.recNotes {
+  font-size: 12px;
+  color: $text-muted;
+  margin-top: 3px;
+  font-style: italic;
+}
+
+// ─── ALERT ROW ───────────────────────────────────────────────────────────────
+.alertRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.alertChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+// ─── PROGRESS SECTION ────────────────────────────────────────────────────────
+.progressSection { }
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: $text-muted;
+  margin-bottom: 6px;
+}
+
+.progressValues {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+// ─── NEXT ALERT ──────────────────────────────────────────────────────────────
+.nextAlert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: $radius-sm;
+  border: 1px solid;
+  font-size: 13px;
+}
+
+// ─── TOGGLE BTN ──────────────────────────────────────────────────────────────
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  font-family: $font-body;
+  transition: color $transition;
+  padding: 4px 0;
+  &:hover { color: $accent; }
+}
+
+// ─── INSTALLMENT LIST ────────────────────────────────────────────────────────
+.installmentList {
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  animation: fadeUp 0.25s ease;
+}
+
+.installmentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid $border;
+  flex-wrap: wrap;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-card; }
+}
+
+.instIdx {
+  font-size: 11px;
+  font-weight: 700;
+  color: $accent;
+  min-width: 20px;
+}
+
+.instDate {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.instAmount {
+  font-size: 13px;
+  font-weight: 700;
+  color: $text-primary;
+  margin-right: 4px;
+}
+
+.daysLabel {
+  font-size: 11px;
+  font-weight: 600;
+  background: $bg-surface;
+  border-radius: 100px;
+  padding: 1px 7px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.paidDate {
+  font-size: 11px;
+  color: $text-muted;
+  font-style: italic;
+  margin-left: auto;
+}
+
+.markPaidBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: $radius-sm;
+  background: $green-soft;
+  border: 1px solid rgba(14, 203, 129, 0.25);
+  color: $green;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  transition: all $transition;
+  margin-left: auto;
+
+  &:hover { background: $green; color: white; }
+}
+
+// ─── PEOPLE LIST ─────────────────────────────────────────────────────────────
+.peopleList {
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  animation: fadeUp 0.25s ease;
+}
+
+.personRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid $border;
+  border-left: 2px solid transparent;
+  transition: all $transition;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-card; }
+}
+
+.personAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.personInfo { flex: 1; min-width: 0; }
+
+.personName {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 3px;
+}
+
+.personContacts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.personMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.personRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.personAmount {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.addPersonBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $accent;
+  font-family: $font-body;
+  border-top: 1px dashed $border;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover { background: $accent-soft; }
+}
+
+.addPersonForm {
+  padding: 14px;
+  border-top: 1px solid $border;
+  background: $bg-surface;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.addPersonTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.addPersonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  @media (max-width: 500px) { grid-template-columns: 1fr; }
+}
+
+.addPersonActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+// ─── MODAL ELEMENTS ──────────────────────────────────────────────────────────
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $accent;
+  margin-bottom: 10px;
+  margin-top: 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid $border;
+}
+
+.installmentEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 12px;
+}
+
+.instEditorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instEditorIdx {
+  font-size: 12px;
+  font-weight: 700;
+  color: $accent;
+  min-width: 20px;
+}
+
+.addInstBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  font-family: $font-body;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: color $transition;
+  &:hover { color: #7c5cfc; }
+}
+
+.totalPreview {
+  text-align: right;
+  font-size: 13px;
+  color: $text-muted;
+  padding-top: 8px;
+  border-top: 1px dashed $border;
+
+  strong { font-size: 16px; color: $accent; }
+}
+
+// ─── SPLIT TYPE TOGGLE ────────────────────────────────────────────────────────
+.splitTypeToggle {
+  display: flex;
+  gap: 0;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.splitTypeBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-muted;
+  font-family: $font-body;
+  cursor: pointer;
+  transition: all $transition;
+  &:hover { color: $text-primary; }
+}
+
+.splitTypeBtnActive {
+  background: $accent;
+  color: white;
+}
+
+// ─── PEOPLE EDITOR ───────────────────────────────────────────────────────────
+.peopleEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 12px;
+}
+
+.personEditorRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.personEditorAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $accent-soft;
+  color: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.personEditorFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.personEditorSub {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+
+  @media (max-width: 460px) { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,366 @@
+@use './variables' as *;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: $bg-base;
+  color: $text-primary;
+  font-family: $font-body;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(124, 92, 252, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 100%, rgba(14, 203, 129, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track { background: $bg-base; }
+::-webkit-scrollbar-thumb {
+  background: $border-light;
+  border-radius: 2px;
+  &:hover { background: $accent; }
+}
+
+::selection {
+  background: $accent-soft;
+  color: $text-primary;
+}
+
+button {
+  cursor: pointer;
+  font-family: $font-body;
+  border: none;
+  background: none;
+}
+
+input, select, textarea {
+  font-family: $font-body;
+}
+
+// ─── UTILITY CLASSES ─────────────────────────────────────────────────────────
+
+.text-green  { color: $green !important; }
+.text-red    { color: $red !important; }
+.text-accent { color: $accent !important; }
+.text-orange { color: $orange !important; }
+.text-muted  { color: $text-muted !important; }
+.text-secondary { color: $text-secondary !important; }
+
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+
+// ─── CARD BASE ────────────────────────────────────────────────────────────────
+
+.card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow-card;
+  transition: border-color $transition, box-shadow $transition;
+
+  &:hover {
+    border-color: $border-light;
+  }
+
+  &--glow {
+    box-shadow: $shadow-card, $shadow-glow;
+    border-color: rgba(124, 92, 252, 0.3);
+  }
+}
+
+// ─── BADGE ────────────────────────────────────────────────────────────────────
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+
+  &--green  { background: $green-soft; color: $green; }
+  &--red    { background: $red-soft; color: $red; }
+  &--orange { background: $orange-soft; color: $orange; }
+  &--accent { background: $accent-soft; color: $accent; }
+  &--blue   { background: $blue-soft; color: $blue; }
+}
+
+// ─── ANIMATE IN ───────────────────────────────────────────────────────────────
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-in {
+  animation: fadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.06}s;
+    }
+  }
+}
+
+// ─── MODAL OVERLAY ───────────────────────────────────────────────────────────
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-box {
+  background: $bg-surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-xl;
+  padding: 28px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), $shadow-glow;
+  animation: fadeUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+
+    h3 {
+      font-family: $font-display;
+      font-size: 22px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: $bg-card;
+    border: 1px solid $border;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all $transition;
+
+    &:hover {
+      background: $red-soft;
+      border-color: $red;
+      color: $red;
+    }
+  }
+}
+
+// ─── FORM ELEMENTS ───────────────────────────────────────────────────────────
+
+.form-group {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-muted;
+    margin-bottom: 6px;
+  }
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  background: $bg-base;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  color: $text-primary;
+  font-family: $font-body;
+  font-size: 14px;
+  outline: none;
+  transition: border-color $transition, box-shadow $transition;
+  appearance: none;
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &::placeholder { color: $text-muted; }
+
+  option {
+    background: $bg-surface;
+    color: $text-primary;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+// ─── BUTTONS ─────────────────────────────────────────────────────────────────
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: $radius-sm;
+  font-family: $font-body;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all $transition;
+  white-space: nowrap;
+
+  &--primary {
+    background: $accent;
+    color: white;
+    &:hover { background: lighten(#7c5cfc, 8%); box-shadow: 0 4px 16px $accent-glow; }
+  }
+
+  &--secondary {
+    background: $bg-card;
+    color: $text-secondary;
+    border: 1px solid $border;
+    &:hover { border-color: $border-light; color: $text-primary; }
+  }
+
+  &--ghost {
+    color: $text-muted;
+    &:hover { color: $text-primary; background: $bg-card; }
+  }
+
+  &--danger {
+    background: $red-soft;
+    color: $red;
+    border: 1px solid rgba(240, 62, 62, 0.2);
+    &:hover { background: $red; color: white; }
+  }
+
+  &--sm {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  &--icon {
+    padding: 8px;
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+  }
+}
+
+// ─── EMPTY STATE ─────────────────────────────────────────────────────────────
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: $text-muted;
+
+  .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  p { font-size: 14px; }
+}
+
+// ─── PAGE WRAPPER ─────────────────────────────────────────────────────────────
+
+.page {
+  padding: 0 0 40px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+
+    h2 {
+      font-family: $font-display;
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+    }
+  }
+}
+
+// ─── PROGRESS BAR ────────────────────────────────────────────────────────────
+
+.progress {
+  height: 6px;
+  background: $border;
+  border-radius: 3px;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, $accent, lighten(#7c5cfc, 15%));
+    transition: width $transition-slow;
+  }
+
+  &--green .progress__fill { background: linear-gradient(90deg, $green, lighten(#0ecb81, 15%)); }
+  &--orange .progress__fill { background: linear-gradient(90deg, $orange, lighten(#ff922b, 15%)); }
+}
