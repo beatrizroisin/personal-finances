@@ -1,17 +1,44 @@
 // ─── INITIAL SEED DATA ───────────────────────────────────────────────────────
-// ─── INITIAL SEED DATA (Limpas para início do zero) ──────────────────────────
 
-export const SEED_CARDS = [];
+export const SEED_CARDS = [
+  { id: 'c1', name: 'Nubank', bank: 'nubank', limit: 8000, color: '#820ad1', lastFour: '4521' },
+  { id: 'c2', name: 'Itaú Visa', bank: 'itau', limit: 5000, color: '#ec7000', lastFour: '9873' },
+  { id: 'c3', name: 'Inter', bank: 'inter', limit: 3000, color: '#ff6600', lastFour: '2210' },
+];
 
-export const SEED_TRANSACTIONS = [];
+export const SEED_TRANSACTIONS = [
+  { id: 't1', desc: 'Salário', amount: 7500, category: 'Renda', date: '2026-04-05', type: 'income', cardId: null },
+  { id: 't2', desc: 'Supermercado Pão de Açúcar', amount: 420, category: 'Alimentação', date: '2026-04-08', type: 'expense', cardId: 'c1' },
+  { id: 't3', desc: 'Netflix', amount: 55, category: 'Lazer', date: '2026-04-10', type: 'expense', cardId: 'c1' },
+  { id: 't4', desc: 'Conta de Luz', amount: 210, category: 'Moradia', date: '2026-04-11', type: 'expense', cardId: null },
+  { id: 't5', desc: 'Uber', amount: 38, category: 'Transporte', date: '2026-04-12', type: 'expense', cardId: 'c2' },
+  { id: 't6', desc: 'Farmácia', amount: 95, category: 'Saúde', date: '2026-04-14', type: 'expense', cardId: 'c1' },
+  { id: 't7', desc: 'Freelance design', amount: 1200, category: 'Renda', date: '2026-04-15', type: 'income', cardId: null },
+  { id: 't8', desc: 'iFood', amount: 67, category: 'Alimentação', date: '2026-04-16', type: 'expense', cardId: 'c1' },
+  { id: 't9', desc: 'Academia Smart Fit', amount: 89, category: 'Saúde', date: '2026-04-17', type: 'expense', cardId: 'c2' },
+  { id: 't10', desc: 'Posto de Gasolina', amount: 180, category: 'Transporte', date: '2026-04-18', type: 'expense', cardId: 'c3' },
+];
 
-export const SEED_BILLS = [];
+export const SEED_BILLS = [
+  { id: 'b1', desc: 'Aluguel', amount: 2200, dueDay: 5, paid: false, category: 'Moradia', recurring: true },
+  { id: 'b2', desc: 'Internet Vivo', amount: 130, dueDay: 10, paid: true, category: 'Moradia', recurring: true },
+  { id: 'b3', desc: 'Academia', amount: 89, dueDay: 15, paid: false, category: 'Saúde', recurring: true },
+  { id: 'b4', desc: 'Seguro Auto', amount: 320, dueDay: 20, paid: false, category: 'Transporte', recurring: true },
+  { id: 'b5', desc: 'Plano de Saúde', amount: 580, dueDay: 25, paid: false, category: 'Saúde', recurring: true },
+];
 
-export const SEED_INSTALLMENTS = [];
+export const SEED_INSTALLMENTS = [
+  { id: 'i1', desc: 'MacBook Pro 14"', monthly: 850, totalInstallments: 12, paid: 3, dueDay: 15, cardId: 'c1', startDate: '2026-01-15' },
+  { id: 'i2', desc: 'iPhone 15 Pro', monthly: 350, totalInstallments: 24, paid: 6, dueDay: 15, cardId: 'c2', startDate: '2025-10-15' },
+  { id: 'i3', desc: 'TV OLED LG 65"', monthly: 280, totalInstallments: 10, paid: 2, dueDay: 20, cardId: 'c1', startDate: '2026-02-20' },
+];
 
-export const SEED_INVESTMENTS = [];
-
-export const SEED_RECEIVABLES = [];
+export const SEED_INVESTMENTS = [
+  { id: 'inv1', desc: 'Tesouro Direto IPCA+', amount: 5000, returnPct: 6.8, type: 'Renda Fixa', startDate: '2025-01-10', institution: 'Tesouro Nacional' },
+  { id: 'inv2', desc: 'CDB Nubank 110% CDI', amount: 8000, returnPct: 11.2, type: 'Renda Fixa', startDate: '2025-06-01', institution: 'Nubank' },
+  { id: 'inv3', desc: 'Ações PETR4', amount: 2500, returnPct: 14.5, type: 'Renda Variável', startDate: '2025-09-15', institution: 'XP Investimentos' },
+  { id: 'inv4', desc: 'Fundo Imobiliário XPML11', amount: 3200, returnPct: 9.3, type: 'FII', startDate: '2026-01-05', institution: 'XP Investimentos' },
+];
 
 // ─── CATEGORIES ───────────────────────────────────────────────────────────────
 export const CATEGORIES = ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Lazer', 'Educação', 'Renda', 'Outros'];
