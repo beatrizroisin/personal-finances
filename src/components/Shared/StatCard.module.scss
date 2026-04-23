@@ -5,7 +5,7 @@
   border: 1px solid var(--border);
   border-radius: $radius-lg;
   padding: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: $shadow-card;
   transition: all $transition;
 
   &:hover { border-color: var(--border)-light; transform: translateY(-1px); }

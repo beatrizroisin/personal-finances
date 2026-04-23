@@ -211,7 +211,7 @@
   border-radius: $radius-sm;
   padding: 10px 14px;
   font-size: 12px;
-  box-shadow: var(--shadow-card);
+  box-shadow: $shadow-card;
 }
 
 .tooltipLabel {

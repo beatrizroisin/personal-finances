@@ -47,7 +47,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: $shadow-card;
   transition: all $transition;
 
   &:hover { border-color: var(--border)-light; transform: translateY(-2px); }

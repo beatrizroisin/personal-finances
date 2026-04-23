@@ -93,7 +93,7 @@
   border: 1px solid var(--border);
   border-radius: $radius-xl;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: $shadow-card;
   transition: all $transition;
 
   &:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
