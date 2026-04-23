@@ -279,16 +279,48 @@ export function useFinance() {
     }))
   }, [_patchReceivable])
 
+
+  // ── EDIT FUNCTIONS ───────────────────────────────────────────────────────────
+
+  const editTransaction = useCallback(async (id, data) => {
+    const updated = { ...data, amount: parseFloat(data.amount) }
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t))
+    await upsertRow('transactions', { ...transactions.find(t => t.id === id), ...updated }, uid)
+  }, [uid, transactions])
+
+  const editBill = useCallback(async (id, data) => {
+    const updated = { ...data, amount: parseFloat(data.amount), dueDay: parseInt(data.dueDay) }
+    setBills(prev => prev.map(b => b.id === id ? { ...b, ...updated } : b))
+    await upsertRow('bills', { ...bills.find(b => b.id === id), ...updated }, uid)
+  }, [uid, bills])
+
+  const editInstallment = useCallback(async (id, data) => {
+    const updated = {
+      ...data,
+      monthly: parseFloat(data.monthly),
+      totalInstallments: parseInt(data.totalInstallments),
+      dueDay: parseInt(data.dueDay),
+    }
+    setInstallments(prev => prev.map(i => i.id === id ? { ...i, ...updated } : i))
+    await upsertRow('installments', { ...installments.find(i => i.id === id), ...updated }, uid)
+  }, [uid, installments])
+
+  const editInvestment = useCallback(async (id, data) => {
+    const updated = { ...data, amount: parseFloat(data.amount), returnPct: parseFloat(data.returnPct) }
+    setInvestments(prev => prev.map(i => i.id === id ? { ...i, ...updated } : i))
+    await upsertRow('investments', { ...investments.find(i => i.id === id), ...updated }, uid)
+  }, [uid, investments])
+
   return {
     loading,
     bankAccounts, balanceHistory,
     cards, transactions, bills, installments, investments, receivables,
     addBankAccount, updateBankBalance, removeBankAccount,
     addCard, removeCard,
-    addTransaction, removeTransaction,
-    addBill, toggleBill, removeBill,
-    addInstallment, payInstallment, removeInstallment,
-    addInvestment, removeInvestment,
+    addTransaction, editTransaction, removeTransaction,
+    addBill, editBill, toggleBill, removeBill,
+    addInstallment, editInstallment, payInstallment, removeInstallment,
+    addInvestment, editInvestment, removeInvestment,
     addReceivable, removeReceivable, markInstallmentPaid, markPersonPaid, addPersonToSplit,
   }
 }
