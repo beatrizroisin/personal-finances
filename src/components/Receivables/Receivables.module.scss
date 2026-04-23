@@ -16,8 +16,8 @@
 }
 
 .summaryBlock {
-  background: $bg-card;
-  border: 1px solid $border;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   padding: 16px;
   display: flex;
@@ -32,13 +32,13 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 
 .summaryValue {
   font-size: 20px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 // ─── FILTERS ─────────────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@
   display: flex;
   gap: 6px;
   margin-bottom: 20px;
-  background: $bg-card;
-  border: 1px solid $border;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: $radius-sm;
   padding: 4px;
   width: fit-content;
@@ -59,9 +59,9 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: $text-muted;
+  color: var(--text-muted);
   transition: all $transition;
-  &:hover { color: $text-primary; }
+  &:hover { color: var(--text-primary); }
 }
 
 .filterBtnActive {
@@ -77,17 +77,17 @@
 }
 
 .recCard {
-  background: $bg-card;
-  border: 1px solid $border;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: $radius-lg;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: $shadow-card;
+  box-shadow: var(--shadow-card);
   transition: all $transition;
 
-  &:hover { border-color: $border-light; }
+  &:hover { border-color: var(--border)-light; }
 }
 
 .recCardDone {
@@ -125,7 +125,7 @@
 .recDesc {
   font-size: 15px;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .recType {
@@ -144,12 +144,12 @@
   gap: 8px;
   flex-wrap: wrap;
   font-size: 13px;
-  color: $text-secondary;
+  color: var(--text-secondary);
 }
 
 .splitSummary {
   font-size: 13px;
-  color: $text-secondary;
+  color: var(--text-secondary);
 }
 
 .contact {
@@ -157,9 +157,9 @@
   align-items: center;
   gap: 3px;
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: 100px;
   padding: 1px 8px;
 }
@@ -182,7 +182,7 @@
 
 .recNotes {
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-top: 3px;
   font-style: italic;
 }
@@ -211,7 +211,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-bottom: 6px;
 }
 
@@ -243,7 +243,7 @@
   gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: $text-muted;
+  color: var(--text-muted);
   font-family: $font-body;
   transition: color $transition;
   padding: 4px 0;
@@ -253,7 +253,7 @@
 // ─── INSTALLMENT LIST ────────────────────────────────────────────────────────
 .installmentList {
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   overflow: hidden;
   animation: fadeUp 0.25s ease;
@@ -264,11 +264,11 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-bottom: 1px solid $border;
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: $bg-card; }
+  &:hover { background: var(--bg-surface); }
 }
 
 .instIdx {
@@ -280,20 +280,20 @@
 
 .instDate {
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 
 .instAmount {
   font-size: 13px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   margin-right: 4px;
 }
 
 .daysLabel {
   font-size: 11px;
   font-weight: 600;
-  background: $bg-surface;
+  background: var(--bg-surface);
   border-radius: 100px;
   padding: 1px 7px;
 }
@@ -310,7 +310,7 @@
 
 .paidDate {
   font-size: 11px;
-  color: $text-muted;
+  color: var(--text-muted);
   font-style: italic;
   margin-left: auto;
 }
@@ -337,7 +337,7 @@
 // ─── PEOPLE LIST ─────────────────────────────────────────────────────────────
 .peopleList {
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   overflow: hidden;
   animation: fadeUp 0.25s ease;
@@ -348,12 +348,12 @@
   align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
-  border-bottom: 1px solid $border;
+  border-bottom: 1px solid var(--border);
   border-left: 2px solid transparent;
   transition: all $transition;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: $bg-card; }
+  &:hover { background: var(--bg-surface); }
 }
 
 .personAvatar {
@@ -373,7 +373,7 @@
 .personName {
   font-size: 14px;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--text-primary);
   margin-bottom: 3px;
 }
 
@@ -403,7 +403,7 @@
 .personAmount {
   font-size: 15px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .addPersonBtn {
@@ -416,7 +416,7 @@
   font-weight: 600;
   color: $accent;
   font-family: $font-body;
-  border-top: 1px dashed $border;
+  border-top: 1px dashed var(--border);
   cursor: pointer;
   transition: all $transition;
 
@@ -425,8 +425,8 @@
 
 .addPersonForm {
   padding: 14px;
-  border-top: 1px solid $border;
-  background: $bg-surface;
+  border-top: 1px solid var(--border);
+  background: var(--bg-surface);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -464,7 +464,7 @@
   margin-bottom: 10px;
   margin-top: 4px;
   padding-bottom: 6px;
-  border-bottom: 1px solid $border;
+  border-bottom: 1px solid var(--border);
 }
 
 .installmentEditor {
@@ -472,7 +472,7 @@
   flex-direction: column;
   gap: 8px;
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   padding: 12px;
 }
@@ -507,9 +507,9 @@
 .totalPreview {
   text-align: right;
   font-size: 13px;
-  color: $text-muted;
+  color: var(--text-muted);
   padding-top: 8px;
-  border-top: 1px dashed $border;
+  border-top: 1px dashed var(--border);
 
   strong { font-size: 16px; color: $accent; }
 }
@@ -519,7 +519,7 @@
   display: flex;
   gap: 0;
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-sm;
   padding: 4px;
   margin-bottom: 16px;
@@ -531,11 +531,11 @@
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: $text-muted;
+  color: var(--text-muted);
   font-family: $font-body;
   cursor: pointer;
   transition: all $transition;
-  &:hover { color: $text-primary; }
+  &:hover { color: var(--text-primary); }
 }
 
 .splitTypeBtnActive {
@@ -549,7 +549,7 @@
   flex-direction: column;
   gap: 10px;
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   padding: 12px;
 }

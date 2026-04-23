@@ -36,8 +36,8 @@
 
 // ─── CARD ────────────────────────────────────────────────────────────────────
 .card {
-  background: $bg-surface;
-  border: 1px solid $border-light;
+  background: var(--bg-surface);
+  border: 1px solid var(--border)-light;
   border-radius: $radius-xl;
   padding: 40px 36px;
   width: 100%;
@@ -77,13 +77,13 @@
   font-family: $font-display;
   font-size: 22px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   line-height: 1.1;
 }
 
 .logoSub {
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-top: 3px;
 }
 
@@ -92,7 +92,7 @@
   display: flex;
   gap: 0;
   background: var(--bg-base);
-  border: 1px solid $border;
+  border: 1px solid var(--border);
   border-radius: $radius-sm;
   padding: 4px;
   margin-bottom: 28px;
@@ -109,11 +109,11 @@
   font-size: 13px;
   font-weight: 600;
   font-family: $font-body;
-  color: $text-muted;
+  color: var(--text-muted);
   transition: all $transition;
   cursor: pointer;
 
-  &:hover { color: $text-primary; }
+  &:hover { color: var(--text-primary); }
 }
 
 .tabActive {
@@ -139,16 +139,16 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 
   input {
     width: 100%;
     background: var(--bg-base);
-    border: 1px solid $border;
+    border: 1px solid var(--border);
     border-radius: $radius-sm;
     padding: 12px 14px;
-    color: $text-primary;
+    color: var(--text-primary);
     font-family: $font-body;
     font-size: 14px;
     outline: none;
@@ -159,7 +159,7 @@
       box-shadow: 0 0 0 3px $accent-soft;
     }
 
-    &::placeholder { color: $text-muted; }
+    &::placeholder { color: var(--text-muted); }
   }
 }
 
@@ -174,13 +174,13 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: $text-muted;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   cursor: pointer;
   transition: color $transition;
 
-  &:hover { color: $text-primary; }
+  &:hover { color: var(--text-primary); }
 }
 
 // ─── MESSAGES ────────────────────────────────────────────────────────────────
@@ -263,7 +263,7 @@
   gap: 6px;
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--border);
 }
 
 .feature {
@@ -271,7 +271,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 
 .featureDot {

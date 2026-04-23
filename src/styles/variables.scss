@@ -35,7 +35,7 @@ $transition:      0.2s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ─── SHADOWS ─────────────────────────────────────────────────────────────────
-$shadow-card:  0 4px 24px rgba(0, 0, 0, 0.15);
+var(--shadow-card):  0 4px 24px rgba(0, 0, 0, 0.15);
 $shadow-glow:  0 0 30px rgba(124, 92, 252, 0.15);
 $shadow-green: 0 0 20px rgba(14, 203, 129, 0.1);
 

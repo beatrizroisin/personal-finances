@@ -10,8 +10,8 @@
 }
 
 .summaryBlock {
-  background: $bg-card;
-  border: 1px solid $border;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: $radius-md;
   padding: 16px;
   display: flex;
@@ -24,13 +24,13 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 
 .summaryValue {
   font-size: 20px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .grid {
@@ -40,17 +40,17 @@
 }
 
 .instCard {
-  background: $bg-card;
-  border: 1px solid $border;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: $radius-lg;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: $shadow-card;
+  box-shadow: var(--shadow-card);
   transition: all $transition;
 
-  &:hover { border-color: $border-light; transform: translateY(-2px); }
+  &:hover { border-color: var(--border)-light; transform: translateY(-2px); }
 }
 
 .instHeader {
@@ -74,7 +74,7 @@
 .instDesc {
   font-size: 15px;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--text-primary);
   margin-bottom: 3px;
 }
 
@@ -89,7 +89,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-bottom: 6px;
 }
 
@@ -101,7 +101,7 @@
 
 .instValLabel {
   font-size: 11px;
-  color: $text-muted;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 2px;
@@ -110,13 +110,13 @@
 .instValBig {
   font-size: 20px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   line-height: 1.1;
 }
 
 .instValSub {
   font-size: 11px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -162,7 +162,7 @@
   border: 1px solid rgba(124, 92, 252, 0.2);
   border-radius: $radius-sm;
   font-size: 13px;
-  color: $text-secondary;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 
   strong { color: $accent; font-size: 16px; }
