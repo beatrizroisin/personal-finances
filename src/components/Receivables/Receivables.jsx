@@ -154,6 +154,7 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
   const pct          = rec.totalAmount > 0 ? (totalPaid / rec.totalAmount) * 100 : 0;
   const next         = rec.installments.find(i => !i.paid);
   const nextStatus   = next ? dueDateStatus(next.dueDate, false) : null;
+  const IconeAtual = nextStatus ? STATUS[nextStatus].icon : null;
 
   return (
     <div className={`${styles.recCard} ${allPaid ? styles.recCardDone : ''}`}
@@ -203,15 +204,17 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
         </div>
       </div>
 
-      {next && nextStatus !== 'pending' && (
-        <div className={styles.nextAlert}
-          style={{ background: STATUS[nextStatus].bg, borderColor: `${STATUS[nextStatus].color}30` }}>
-          <STATUS[nextStatus].icon size={13} color={STATUS[nextStatus].color} />
-          <span style={{ color: STATUS[nextStatus].color }}>
-            Próxima parcela: {formatCurrency(next.amount)} — vence {formatDate(next.dueDate)}
-          </span>
-        </div>
-      )}
+{next && nextStatus !== 'pending' && (
+    <div className={styles.nextAlert}
+      style={{ background: STATUS[nextStatus].bg, borderColor: `${STATUS[nextStatus].color}30` }}>
+      
+      {IconeAtual && <IconeAtual size={13} color={STATUS[nextStatus].color} />}
+      
+      <span style={{ color: STATUS[nextStatus].color }}>
+        Próxima parcela: {formatCurrency(next.amount)} — vence {formatDate(next.dueDate)}
+      </span>
+    </div>
+  )}
 
       <button className={styles.toggleBtn} onClick={() => setOpen(!open)}>
         {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
