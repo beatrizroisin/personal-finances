@@ -88,7 +88,7 @@
     background: #ff922b; 
   }
   .sunIcon { color: white; }
-  .moonIcon { color: $text-muted; }
+  .moonIcon { color: var(--text-muted); }
 }
 
 
@@ -97,7 +97,7 @@
     transform: translateX(calc(var(--btn-width) - var(--btn-height)));
     background: #7c5cfc; 
   }
-  .sunIcon { color: $text-muted; }
+  .sunIcon { color: var(--text-muted); }
   .moonIcon { color: white; }
 }
 
