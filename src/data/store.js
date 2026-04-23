@@ -245,17 +245,18 @@ export const resetRecurringIfNewMonth = (bills, lastResetMonth) => {
 // ─── CASHFLOW HELPERS ─────────────────────────────────────────────────────────
 // Returns an array of { year, month, label } for N months starting from offset
 // offset 0 = current month, -2 = 2 months ago, 3 = 3 months ahead
-export const getMonthRange = (count = 13, startOffset = -2) => {
+// Returns months from current month through December 2026
+export const getMonthRange = () => {
   const now = new Date();
+  const startMonth = now.getMonth() + 1; // 1-12
   const result = [];
-  for (let i = startOffset; i < startOffset + count; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+  for (let m = startMonth; m <= 12; m++) {
+    const d = new Date(2026, m - 1, 1);
     result.push({
-      year:  d.getFullYear(),
-      month: d.getMonth() + 1,       // 1-12
-      key:   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,
-      label: d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
-         .replace('.', '').replace(' ', ''),
+      year:  2026,
+      month: m,
+      key:   `2026-${String(m).padStart(2, '0')}`,
+      label: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
       longLabel: d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
     });
   }
@@ -263,17 +264,17 @@ export const getMonthRange = (count = 13, startOffset = -2) => {
 };
 
 // Build cashflow for a specific { year, month }
-// Returns { income, expenses, installments, bills, balance }
-export const buildMonthCashflow = ({ year, month }, transactions, bills, installments) => {
+// Returns { income, expenses, installments, bills, receivables, balance }
+export const buildMonthCashflow = ({ year, month }, transactions, bills, installments, receivables = []) => {
   const pad = n => String(n).padStart(2, '0');
   const prefix = `${year}-${pad(month)}`;
 
   // Real transactions for that month
-  const monthTx = transactions.filter(t => t.date?.startsWith(prefix));
-  const txIncome   = monthTx.filter(t => t.type === 'income') .reduce((s, t) => s + t.amount, 0);
+  const monthTx    = transactions.filter(t => t.date?.startsWith(prefix));
+  const txIncome   = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const txExpenses = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
-  // Recurring bills projected for that month (always show, paid status is current-month only)
+  // Recurring bills projected for that month
   const now = new Date();
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
   const projectedBills = bills
@@ -281,13 +282,12 @@ export const buildMonthCashflow = ({ year, month }, transactions, bills, install
     .map(b => ({
       id: b.id, desc: b.desc, amount: b.amount, dueDay: b.dueDay,
       category: b.category,
-      // paid only meaningful for the current month
       paid: isCurrentMonth ? b.paid : false,
       dueDate: `${year}-${pad(month)}-${pad(b.dueDay)}`,
     }));
   const billsTotal = projectedBills.reduce((s, b) => s + b.amount, 0);
 
-  // Active installments for that month
+  // Active expense installments for that month (parcelamentos a PAGAR)
   const targetDate = new Date(year, month - 1, 1);
   const projectedInstallments = installments
     .filter(inst => {
@@ -304,14 +304,54 @@ export const buildMonthCashflow = ({ year, month }, transactions, bills, install
     }));
   const installmentsTotal = projectedInstallments.reduce((s, i) => s + i.amount, 0);
 
+  // ─── RECEIVABLES: valores a RECEBER neste mês ──────────────────────────────
+  // type 'installment': cada parcela tem dueDate → filtra pelo mês
+  // type 'split': cada pessoa tem dueDate → filtra pelo mês
+  const projectedReceivables = [];
+  receivables.forEach(rec => {
+    if (rec.type === 'installment') {
+      rec.installments
+        .filter(i => !i.paid && i.dueDate?.startsWith(prefix))
+        .forEach(i => {
+          projectedReceivables.push({
+            id: i.id,
+            desc: rec.desc,
+            sub: rec.person?.name || '',
+            amount: i.amount,
+            dueDate: i.dueDate,
+            paid: i.paid,
+            source: 'installment',
+          });
+        });
+    } else if (rec.type === 'split') {
+      rec.people
+        .filter(p => !p.paid && p.dueDate?.startsWith(prefix))
+        .forEach(p => {
+          projectedReceivables.push({
+            id: p.id,
+            desc: rec.desc,
+            sub: p.name,
+            amount: p.amount,
+            dueDate: p.dueDate,
+            paid: p.paid,
+            source: 'split',
+          });
+        });
+    }
+  });
+  const receivablesTotal = projectedReceivables.reduce((s, r) => s + r.amount, 0);
+
+  const totalIncome   = txIncome + receivablesTotal;
   const totalExpenses = txExpenses + billsTotal + installmentsTotal;
-  const balance       = txIncome - totalExpenses;
+  const balance       = totalIncome - totalExpenses;
 
   return {
-    txIncome, txExpenses, txIncomeTx: monthTx.filter(t => t.type === 'income'),
-    txExpenseTx: monthTx.filter(t => t.type === 'expense'),
+    txIncome, txExpenses,
+    txIncomeTx:   monthTx.filter(t => t.type === 'income'),
+    txExpenseTx:  monthTx.filter(t => t.type === 'expense'),
     bills: projectedBills, billsTotal,
     installments: projectedInstallments, installmentsTotal,
-    totalExpenses, balance,
+    receivables: projectedReceivables, receivablesTotal,
+    totalIncome, totalExpenses, balance,
   };
 };

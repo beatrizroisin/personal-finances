@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react';
-import { Plus, Trash2, Check, Clock, AlertTriangle, ChevronDown, ChevronUp,
-  User, Users, Copy, Phone, Banknote, SplitSquareHorizontal } from 'lucide-react';
+import {
+  Plus, Trash2, Check, Clock, AlertTriangle, ChevronDown, ChevronUp,
+  User, Users, Copy, Phone, Banknote, SplitSquareHorizontal, FileDown,
+} from 'lucide-react';
 import Modal from '../Shared/Modal';
 import { formatCurrency, formatDate, todayStr, dueDateStatus, daysUntilDue, generateId } from '../../data/store';
 import styles from './Receivables.module.scss';
 
 // ─── STATUS CONFIG ────────────────────────────────────────────────────────────
 const STATUS = {
-  paid:    { label: 'Recebido',     color: '#0ecb81', bg: 'rgba(14,203,129,0.12)',  icon: Check },
-  pending: { label: 'Pendente',     color: '#8888bb', bg: 'rgba(136,136,187,0.08)', icon: Clock },
-  urgent:  { label: 'Vence em breve', color: '#ff922b', bg: 'rgba(255,146,43,0.12)', icon: AlertTriangle },
-  overdue: { label: 'Atrasado',     color: '#f03e3e', bg: 'rgba(240,62,62,0.12)',  icon: AlertTriangle },
+  paid:    { label: 'Recebido',       color: '#0ecb81', bg: 'rgba(14,203,129,0.12)',   icon: Check },
+  pending: { label: 'Pendente',       color: '#8888bb', bg: 'rgba(136,136,187,0.08)',  icon: Clock },
+  urgent:  { label: 'Vence em breve', color: '#ff922b', bg: 'rgba(255,146,43,0.12)',   icon: AlertTriangle },
+  overdue: { label: 'Atrasado',       color: '#f03e3e', bg: 'rgba(240,62,62,0.12)',    icon: AlertTriangle },
 };
 
 function StatusBadge({ status }) {
@@ -37,23 +39,127 @@ function copyToClipboard(text) {
   if (text) navigator.clipboard.writeText(text).catch(() => {});
 }
 
-// ─── INSTALLMENT RECEIVABLE CARD ─────────────────────────────────────────────
+// ─── PDF EXPORT HELPER ────────────────────────────────────────────────────────
+function exportSplitPDF(rec) {
+  const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
+  const fmtDate = (s) => { if (!s) return ''; const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
+
+  const totalPaid    = rec.people.filter(p => p.paid).reduce((s, p) => s + p.amount, 0);
+  const totalPending = rec.people.filter(p => !p.paid).reduce((s, p) => s + p.amount, 0);
+
+  const rows = rec.people.map(p => `
+    <tr style="border-bottom:1px solid #eee">
+      <td style="padding:10px 12px;font-weight:600;color:#1a1a2e">${p.name}</td>
+      <td style="padding:10px 12px;color:#5a5a7a">${p.phone || '—'}</td>
+      <td style="padding:10px 12px;color:#5a5a7a">${p.pix || '—'}</td>
+      <td style="padding:10px 12px;text-align:center">${fmtDate(p.dueDate)}</td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700;color:#7c5cfc">${fmt(p.amount)}</td>
+      <td style="padding:10px 12px;text-align:center">
+        <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;
+          background:${p.paid ? '#d1fae5' : '#fef3c7'};color:${p.paid ? '#065f46' : '#92400e'}">
+          ${p.paid ? `✓ Pago em ${fmtDate(p.paidDate)}` : 'Pendente'}
+        </span>
+      </td>
+    </tr>
+  `).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Split — ${rec.desc}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f8; color: #1a1a2e; padding: 40px; }
+    .container { max-width: 860px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #7c5cfc, #4f46e5); padding: 32px 40px; color: white; }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .header p  { font-size: 14px; opacity: 0.8; }
+    .stats { display: flex; gap: 0; border-bottom: 1px solid #eee; }
+    .stat { flex: 1; padding: 20px 28px; border-right: 1px solid #eee; }
+    .stat:last-child { border-right: none; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9090aa; margin-bottom: 6px; }
+    .stat-value { font-size: 22px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #9090aa; background: #f8f8fc; border-bottom: 2px solid #eee; }
+    thead th:last-child, thead th:nth-child(5) { text-align: right; }
+    thead th:nth-child(4) { text-align: center; }
+    .footer { padding: 24px 40px; background: #f8f8fc; border-top: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .footer-note { font-size: 12px; color: #9090aa; }
+    .footer-total { font-size: 20px; font-weight: 700; color: #7c5cfc; }
+    @media print {
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>${rec.desc}</h1>
+      <p>${rec.notes || ''} · ${rec.people.length} pessoa(s) · Gerado em ${fmtDate(new Date().toISOString().split('T')[0])}</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Total</div>
+        <div class="stat-value" style="color:#7c5cfc">${fmt(rec.totalAmount)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Recebido</div>
+        <div class="stat-value" style="color:#059669">${fmt(totalPaid)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pendente</div>
+        <div class="stat-value" style="color:#d97706">${fmt(totalPending)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pessoas</div>
+        <div class="stat-value">${rec.people.length}</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Chave Pix</th>
+          <th style="text-align:center">Vencimento</th>
+          <th style="text-align:right">Valor</th>
+          <th style="text-align:center">Status</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="footer">
+      <span class="footer-note">Finanças Pessoais · Split exportado automaticamente</span>
+      <span class="footer-total">Total: ${fmt(rec.totalAmount)}</span>
+    </div>
+  </div>
+  <script>window.onload = () => window.print();</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (win) setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+// ─── INSTALLMENT CARD ─────────────────────────────────────────────────────────
 function InstallmentCard({ rec, onMarkPaid, onRemove }) {
   const [open, setOpen] = useState(false);
   const totalPaid    = rec.installments.filter(i => i.paid).reduce((s, i) => s + i.amount, 0);
   const totalPending = rec.installments.filter(i => !i.paid).reduce((s, i) => s + i.amount, 0);
   const allPaid      = rec.installments.every(i => i.paid);
   const pct          = rec.totalAmount > 0 ? (totalPaid / rec.totalAmount) * 100 : 0;
-
-  // Next due installment
-  const next = rec.installments.find(i => !i.paid);
-  const nextStatus = next ? dueDateStatus(next.dueDate, false) : null;
+  const next         = rec.installments.find(i => !i.paid);
+  const nextStatus   = next ? dueDateStatus(next.dueDate, false) : null;
+  const IconeAtual = nextStatus ? STATUS[nextStatus].icon : null;
 
   return (
     <div className={`${styles.recCard} ${allPaid ? styles.recCardDone : ''}`}
       style={{ borderColor: nextStatus ? `${STATUS[nextStatus]?.color}30` : undefined }}>
 
-      {/* Header */}
       <div className={styles.recHeader}>
         <div className={styles.recIconWrap} style={{ background: 'rgba(124,92,252,0.12)' }}>
           <User size={18} color="#7c5cfc" />
@@ -68,9 +174,7 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
           <p className={styles.recPerson}>
             <User size={12} /> {rec.person.name}
             {rec.person.phone && (
-              <span className={styles.contact}>
-                <Phone size={11} /> {rec.person.phone}
-              </span>
+              <span className={styles.contact}><Phone size={11} /> {rec.person.phone}</span>
             )}
             {rec.person.pix && (
               <span className={styles.pix} onClick={() => copyToClipboard(rec.person.pix)} title="Copiar Pix">
@@ -85,7 +189,6 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
         </button>
       </div>
 
-      {/* Progress */}
       <div className={styles.progressSection}>
         <div className={styles.progressInfo}>
           <span>{rec.installments.filter(i => i.paid).length}/{rec.installments.length} parcelas</span>
@@ -97,24 +200,22 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
         <div className={styles.progressValues}>
           <span style={{ color: '#0ecb81' }}>Recebido: {formatCurrency(totalPaid)}</span>
           {!allPaid && <span style={{ color: '#ff922b' }}>A receber: {formatCurrency(totalPending)}</span>}
-          {allPaid && <span style={{ color: '#0ecb81', fontWeight: 600 }}>✓ Tudo recebido!</span>}
+          {allPaid  && <span style={{ color: '#0ecb81', fontWeight: 600 }}>✓ Tudo recebido!</span>}
         </div>
       </div>
 
-      {/* Next installment alert */}
-      {next && nextStatus !== 'pending' && (
-        <div className={styles.nextAlert} style={{ background: STATUS[nextStatus].bg, borderColor: `${STATUS[nextStatus].color}30` }}>
-         {(() => {
-            const IconComponent = STATUS[nextStatus].icon;
-            return <IconComponent size={13} color={STATUS[nextStatus].color} />;
-          })()}
-          <span style={{ color: STATUS[nextStatus].color }}>
-            Próxima parcela: {formatCurrency(next.amount)} — vence {formatDate(next.dueDate)}
-          </span>
-        </div>
-      )}
+{next && nextStatus !== 'pending' && (
+    <div className={styles.nextAlert}
+      style={{ background: STATUS[nextStatus].bg, borderColor: `${STATUS[nextStatus].color}30` }}>
+      
+      {IconeAtual && <IconeAtual size={13} color={STATUS[nextStatus].color} />}
+      
+      <span style={{ color: STATUS[nextStatus].color }}>
+        Próxima parcela: {formatCurrency(next.amount)} — vence {formatDate(next.dueDate)}
+      </span>
+    </div>
+  )}
 
-      {/* Toggle installments */}
       <button className={styles.toggleBtn} onClick={() => setOpen(!open)}>
         {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         {open ? 'Ocultar parcelas' : 'Ver todas as parcelas'}
@@ -125,16 +226,14 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
           {rec.installments.map((inst, idx) => {
             const st = dueDateStatus(inst.dueDate, inst.paid);
             return (
-              <div key={inst.id} className={styles.installmentRow}
-                style={{ opacity: inst.paid ? 0.65 : 1 }}>
+              <div key={inst.id} className={styles.installmentRow} style={{ opacity: inst.paid ? 0.65 : 1 }}>
                 <span className={styles.instIdx}>{idx + 1}ª</span>
                 <span className={styles.instDate}>{formatDate(inst.dueDate)}</span>
                 <span className={styles.instAmount}>{formatCurrency(inst.amount)}</span>
                 <DaysLabel dateStr={inst.dueDate} paid={inst.paid} />
                 <StatusBadge status={st} />
                 {!inst.paid && (
-                  <button className={styles.markPaidBtn}
-                    onClick={() => onMarkPaid(rec.id, inst.id)}>
+                  <button className={styles.markPaidBtn} onClick={() => onMarkPaid(rec.id, inst.id)}>
                     <Check size={12} /> Recebi
                   </button>
                 )}
@@ -150,28 +249,24 @@ function InstallmentCard({ rec, onMarkPaid, onRemove }) {
   );
 }
 
-// ─── SPLIT RECEIVABLE CARD ────────────────────────────────────────────────────
+// ─── SPLIT CARD ───────────────────────────────────────────────────────────────
 function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]               = useState(false);
   const [addingPerson, setAddingPerson] = useState(false);
-  const [newPerson, setNewPerson] = useState({ name: '', amount: '', dueDate: todayStr(), phone: '', pix: '' });
+  const [newPerson, setNewPerson]     = useState({ name: '', amount: '', dueDate: todayStr(), phone: '', pix: '' });
 
   const totalPaid    = rec.people.filter(p => p.paid).reduce((s, p) => s + p.amount, 0);
   const totalPending = rec.people.filter(p => !p.paid).reduce((s, p) => s + p.amount, 0);
   const allPaid      = rec.people.every(p => p.paid);
   const pct          = rec.totalAmount > 0 ? (totalPaid / rec.totalAmount) * 100 : 0;
-
-  const overdueCount  = rec.people.filter(p => !p.paid && dueDateStatus(p.dueDate, false) === 'overdue').length;
-  const urgentCount   = rec.people.filter(p => !p.paid && dueDateStatus(p.dueDate, false) === 'urgent').length;
+  const overdueCount = rec.people.filter(p => !p.paid && dueDateStatus(p.dueDate, false) === 'overdue').length;
+  const urgentCount  = rec.people.filter(p => !p.paid && dueDateStatus(p.dueDate, false) === 'urgent').length;
 
   const handleAddPerson = () => {
     if (!newPerson.name || !newPerson.amount) return;
     onAddPerson(rec.id, {
-      name: newPerson.name,
-      amount: parseFloat(newPerson.amount),
-      dueDate: newPerson.dueDate,
-      phone: newPerson.phone || null,
-      pix: newPerson.pix || null,
+      name: newPerson.name, amount: parseFloat(newPerson.amount),
+      dueDate: newPerson.dueDate, phone: newPerson.phone || null, pix: newPerson.pix || null,
     });
     setNewPerson({ name: '', amount: '', dueDate: todayStr(), phone: '', pix: '' });
     setAddingPerson(false);
@@ -181,7 +276,6 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
     <div className={`${styles.recCard} ${allPaid ? styles.recCardDone : ''}`}
       style={{ borderColor: overdueCount > 0 ? 'rgba(240,62,62,0.3)' : urgentCount > 0 ? 'rgba(255,146,43,0.3)' : undefined }}>
 
-      {/* Header */}
       <div className={styles.recHeader}>
         <div className={styles.recIconWrap} style={{ background: 'rgba(14,203,129,0.1)' }}>
           <Users size={18} color="#0ecb81" />
@@ -198,12 +292,18 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
           </p>
           {rec.notes && <p className={styles.recNotes}>{rec.notes}</p>}
         </div>
-        <button className="btn btn--icon btn--ghost" onClick={() => onRemove(rec.id)}>
-          <Trash2 size={14} />
-        </button>
+        {/* Action buttons */}
+        <div className={styles.recActions}>
+          <button className={`btn btn--sm ${styles.exportBtn}`}
+            onClick={() => exportSplitPDF(rec)} title="Exportar PDF">
+            <FileDown size={13} /> Exportar PDF
+          </button>
+          <button className="btn btn--icon btn--ghost" onClick={() => onRemove(rec.id)}>
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Alerts */}
       {(overdueCount > 0 || urgentCount > 0) && (
         <div className={styles.alertRow}>
           {overdueCount > 0 && (
@@ -219,7 +319,6 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
         </div>
       )}
 
-      {/* Progress */}
       <div className={styles.progressSection}>
         <div className={styles.progressInfo}>
           <span>{rec.people.filter(p => p.paid).length}/{rec.people.length} pessoas pagaram</span>
@@ -231,11 +330,10 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
         <div className={styles.progressValues}>
           <span style={{ color: '#0ecb81' }}>Recebido: {formatCurrency(totalPaid)}</span>
           {!allPaid && <span style={{ color: '#ff922b' }}>Falta: {formatCurrency(totalPending)}</span>}
-          {allPaid && <span style={{ color: '#0ecb81', fontWeight: 600 }}>✓ Todos pagaram!</span>}
+          {allPaid  && <span style={{ color: '#0ecb81', fontWeight: 600 }}>✓ Todos pagaram!</span>}
         </div>
       </div>
 
-      {/* Toggle people list */}
       <button className={styles.toggleBtn} onClick={() => setOpen(!open)}>
         {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         {open ? 'Ocultar pessoas' : `Ver ${rec.people.length} pessoas`}
@@ -244,7 +342,7 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
       {open && (
         <div className={styles.peopleList}>
           {rec.people.map(person => {
-            const st = dueDateStatus(person.dueDate, person.paid);
+            const st  = dueDateStatus(person.dueDate, person.paid);
             const cfg = STATUS[st];
             return (
               <div key={person.id} className={styles.personRow}
@@ -257,9 +355,7 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
                     {person.name}
                   </p>
                   <div className={styles.personContacts}>
-                    {person.phone && (
-                      <span className={styles.contact}><Phone size={11} /> {person.phone}</span>
-                    )}
+                    {person.phone && <span className={styles.contact}><Phone size={11} /> {person.phone}</span>}
                     {person.pix && (
                       <span className={styles.pix} onClick={() => copyToClipboard(person.pix)} title="Copiar chave Pix">
                         <Banknote size={11} /> {person.pix} <Copy size={10} />
@@ -287,7 +383,6 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
             );
           })}
 
-          {/* Add person inline */}
           {!addingPerson ? (
             <button className={styles.addPersonBtn} onClick={() => setAddingPerson(true)}>
               <Plus size={14} /> Adicionar pessoa
@@ -319,34 +414,22 @@ function SplitCard({ rec, onMarkPaid, onRemove, onAddPerson }) {
   );
 }
 
-// ─── MODALS ──────────────────────────────────────────────────────────────────
+// ─── ADD INSTALLMENT MODAL ────────────────────────────────────────────────────
 function AddInstallmentReceivableModal({ onClose, onSave }) {
   const [form, setForm] = useState({ desc: '', notes: '', person: { name: '', phone: '', pix: '' } });
-  const [installments, setInstallments] = useState([
-    { id: generateId(), dueDate: todayStr(), amount: '' }
-  ]);
+  const [installments, setInstallments] = useState([{ id: generateId(), dueDate: todayStr(), amount: '' }]);
 
-  const addRow = () => setInstallments(p => [...p, { id: generateId(), dueDate: todayStr(), amount: '' }]);
+  const addRow    = () => setInstallments(p => [...p, { id: generateId(), dueDate: todayStr(), amount: '' }]);
   const removeRow = (id) => setInstallments(p => p.filter(r => r.id !== id));
   const updateRow = (id, field, value) =>
     setInstallments(p => p.map(r => r.id === id ? { ...r, [field]: value } : r));
-
   const totalAmount = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
 
   const handleSave = () => {
     if (!form.desc || !form.person.name || installments.some(i => !i.amount)) return;
     onSave({
-      type: 'installment',
-      desc: form.desc,
-      notes: form.notes,
-      person: form.person,
-      totalAmount,
-      installments: installments.map(i => ({
-        ...i,
-        amount: parseFloat(i.amount),
-        paid: false,
-        paidDate: null,
-      })),
+      type: 'installment', desc: form.desc, notes: form.notes, person: form.person, totalAmount,
+      installments: installments.map(i => ({ ...i, amount: parseFloat(i.amount), paid: false, paidDate: null })),
     });
   };
 
@@ -372,10 +455,9 @@ function AddInstallmentReceivableModal({ onClose, onSave }) {
       </div>
       <div className="form-group">
         <label>Chave Pix</label>
-        <input className="form-input" value={form.person.pix} placeholder="CPF, e-mail, telefone ou chave aleatória"
+        <input className="form-input" value={form.person.pix} placeholder="CPF, e-mail ou chave aleatória"
           onChange={e => setForm({ ...form, person: { ...form.person, pix: e.target.value } })} />
       </div>
-
       <p className={styles.sectionLabel}>Parcelas a receber</p>
       <div className={styles.installmentEditor}>
         {installments.map((inst, idx) => (
@@ -401,7 +483,6 @@ function AddInstallmentReceivableModal({ onClose, onSave }) {
           </div>
         )}
       </div>
-
       <div className="form-group" style={{ marginTop: 12 }}>
         <label>Observações</label>
         <input className="form-input" value={form.notes} placeholder="Opcional"
@@ -415,6 +496,7 @@ function AddInstallmentReceivableModal({ onClose, onSave }) {
   );
 }
 
+// ─── ADD SPLIT MODAL ──────────────────────────────────────────────────────────
 function AddSplitModal({ onClose, onSave }) {
   const [form, setForm] = useState({ desc: '', notes: '', splitEqual: true, equalAmount: '' });
   const [people, setPeople] = useState([
@@ -422,7 +504,7 @@ function AddSplitModal({ onClose, onSave }) {
     { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() },
   ]);
 
-  const addPerson = () => setPeople(p => [...p, { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() }]);
+  const addPerson    = () => setPeople(p => [...p, { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() }]);
   const removePerson = (id) => { if (people.length > 2) setPeople(p => p.filter(r => r.id !== id)); };
   const updatePerson = (id, field, value) =>
     setPeople(p => p.map(r => r.id === id ? { ...r, [field]: value } : r));
@@ -438,13 +520,7 @@ function AddSplitModal({ onClose, onSave }) {
       amount: form.splitEqual ? parseFloat(form.equalAmount) || 0 : parseFloat(p.amount) || 0,
       paid: false, paidDate: null,
     }));
-    onSave({
-      type: 'split',
-      desc: form.desc,
-      notes: form.notes,
-      totalAmount,
-      people: finalPeople,
-    });
+    onSave({ type: 'split', desc: form.desc, notes: form.notes, totalAmount, people: finalPeople });
   };
 
   return (
@@ -454,18 +530,12 @@ function AddSplitModal({ onClose, onSave }) {
         <input className="form-input" value={form.desc} placeholder="Ex: Churrasco, viagem, jantar..."
           onChange={e => setForm({ ...form, desc: e.target.value })} />
       </div>
-
       <div className={styles.splitTypeToggle}>
         <button className={`${styles.splitTypeBtn} ${form.splitEqual ? styles.splitTypeBtnActive : ''}`}
-          onClick={() => setForm({ ...form, splitEqual: true })}>
-          Dividir igual
-        </button>
+          onClick={() => setForm({ ...form, splitEqual: true })}>Dividir igual</button>
         <button className={`${styles.splitTypeBtn} ${!form.splitEqual ? styles.splitTypeBtnActive : ''}`}
-          onClick={() => setForm({ ...form, splitEqual: false })}>
-          Valores diferentes
-        </button>
+          onClick={() => setForm({ ...form, splitEqual: false })}>Valores diferentes</button>
       </div>
-
       {form.splitEqual && (
         <div className="form-row">
           <div className="form-group">
@@ -480,7 +550,6 @@ function AddSplitModal({ onClose, onSave }) {
           </div>
         </div>
       )}
-
       <p className={styles.sectionLabel}>Pessoas ({people.length})</p>
       <div className={styles.peopleEditor}>
         {people.map((person, idx) => (
@@ -518,7 +587,6 @@ function AddSplitModal({ onClose, onSave }) {
           </div>
         )}
       </div>
-
       <div className="form-group" style={{ marginTop: 12 }}>
         <label>Observações</label>
         <input className="form-input" value={form.notes} placeholder="Opcional"
@@ -536,10 +604,9 @@ function AddSplitModal({ onClose, onSave }) {
 export default function Receivables({ receivables, addReceivable, removeReceivable,
   markInstallmentPaid, markPersonPaid, addPersonToSplit }) {
 
-  const [modal, setModal] = useState(null); // null | 'installment' | 'split'
-  const [filterType, setFilterType] = useState('all'); // all | installment | split | pending
+  const [modal, setModal]       = useState(null);
+  const [filterType, setFilterType] = useState('all');
 
-  // Stats
   const stats = useMemo(() => {
     let totalReceived = 0, totalPending = 0, overdueCount = 0;
     receivables.forEach(r => {
@@ -579,7 +646,7 @@ export default function Receivables({ receivables, addReceivable, removeReceivab
       <div className="page__header">
         <h2>A Receber</h2>
         <div className={styles.addBtnGroup}>
-          <button className={`btn btn--secondary`} onClick={() => setModal('installment')}>
+          <button className="btn btn--secondary" onClick={() => setModal('installment')}>
             <User size={15} /> Parcelado
           </button>
           <button className="btn btn--primary" onClick={() => setModal('split')}>
@@ -600,7 +667,7 @@ export default function Receivables({ receivables, addReceivable, removeReceivab
         </div>
         <div className={styles.summaryBlock} style={{ borderColor: stats.overdueCount > 0 ? 'rgba(240,62,62,0.3)' : undefined }}>
           <span className={styles.summaryLabel}>Em atraso</span>
-          <span className={styles.summaryValue} style={{ color: stats.overdueCount > 0 ? '#f03e3e' : '#55557a' }}>
+          <span className={styles.summaryValue} style={{ color: stats.overdueCount > 0 ? '#f03e3e' : 'var(--text-muted)' }}>
             {stats.overdueCount} item(s)
           </span>
         </div>
@@ -644,7 +711,6 @@ export default function Receivables({ receivables, addReceivable, removeReceivab
         )}
       </div>
 
-      {/* Modals */}
       {modal === 'installment' && (
         <AddInstallmentReceivableModal
           onClose={() => setModal(null)}

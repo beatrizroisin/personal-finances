@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use '../../styles/variables.scss' as *;
 
 .wrap {
   display: flex;
@@ -9,8 +9,8 @@
 .sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: $bg-surface;
-  border-right: 1px solid $border;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   padding: 28px 16px;
@@ -33,6 +33,72 @@
   @media (max-width: 768px) {
     left: 0;
   }
+}
+.themeBtn {
+  --btn-width: 56px;
+  --btn-height: 28px;
+  --padding: 4px;
+  
+  width: var(--btn-width);
+  height: var(--btn-height);
+  border-radius: 20px; 
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--text-primary);
+  }
+}
+
+.themePill {
+  position: absolute;
+  top: var(--padding);
+  left: var(--padding);
+  width: calc(var(--btn-height) - (var(--padding) * 2));
+  height: calc(var(--btn-height) - (var(--padding) * 2));
+  background: var(--text-primary); 
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  z-index: 1;
+}
+
+.themeIcons {
+  position: relative;
+  z-index: 2; 
+  width: 100%;
+  display: flex;
+  justify-content: space-around; 
+  align-items: center;
+  pointer-events: none; 
+}
+
+.sunIcon, .moonIcon {
+  transition: color 0.3s ease;
+}
+
+.themeBtnLight {
+  .themePill {
+    transform: translateX(0);
+    background: #ff922b; 
+  }
+  .sunIcon { color: white; }
+  .moonIcon { color: var(--text-muted); }
+}
+
+
+.themeBtnDark {
+  .themePill {
+    transform: translateX(calc(var(--btn-width) - var(--btn-height)));
+    background: #7c5cfc; 
+  }
+  .sunIcon { color: var(--text-muted); }
+  .moonIcon { color: white; }
 }
 
 .overlay {
@@ -60,10 +126,10 @@
     z-index: 95;
     width: 40px;
     height: 40px;
-    background: $bg-card;
-    border: 1px solid $border-light;
+    background: var(--bg-surface);
+    border: 1px solid var(--border)-light;
     border-radius: $radius-sm;
-    color: $text-primary;
+    color: var(--text-primary);
     box-shadow: $shadow-card;
   }
 }
@@ -73,7 +139,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 36px;
+  margin-bottom: 11px;
   padding: 0 8px;
 }
 
@@ -94,13 +160,13 @@
   font-family: $font-display;
   font-size: 18px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .logoSub {
   font-size: 11px;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -118,15 +184,15 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: $radius-sm;
-  color: $text-muted;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
   transition: all $transition;
 
   &:hover {
-    background: $bg-card;
-    color: $text-primary;
+    background: var(--bg-surface);
+    color: var(--text-primary);
   }
 }
 
@@ -144,12 +210,12 @@
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 .sidebarFooter {
   padding: 16px 8px 0;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--border);
   margin-top: 24px;
 
   p {
     font-size: 11px;
-    color: $text-muted;
+    color: var(--text-muted);
     line-height: 1.8;
   }
 }
@@ -170,7 +236,7 @@
 .userSection {
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -204,7 +270,7 @@
 .userName {
   font-size: 13px;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -212,7 +278,7 @@
 
 .userEmail {
   font-size: 11px;
-  color: $text-muted;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -226,8 +292,8 @@
   padding: 8px 12px;
   border-radius: $radius-sm;
   background: transparent;
-  border: 1px solid $border;
-  color: $text-muted;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   font-family: $font-body;
   font-size: 13px;
   font-weight: 500;

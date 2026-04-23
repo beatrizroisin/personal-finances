@@ -1,37 +1,48 @@
-import { useState } from 'react';
-import { Plus, Trash2, ArrowUpRight, ArrowDownLeft, Filter } from 'lucide-react';
-import Modal from '../Shared/Modal';
-import { formatCurrency, formatDate, CATEGORIES, CATEGORY_COLORS, todayStr, generateId } from '../../data/store';
-import styles from './Transactions.module.scss';
+import { useState } from 'react'
+import { Plus, Trash2, Pencil, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import Modal from '../Shared/Modal'
+import { formatCurrency, formatDate, CATEGORIES, CATEGORY_COLORS, todayStr } from '../../data/store'
+import styles from './Transactions.module.scss'
 
-export default function Transactions({ transactions, cards, addTransaction, removeTransaction }) {
-  const [filter, setFilter] = useState('all');
-  const [catFilter, setCatFilter] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ desc: '', amount: '', category: 'Alimentação', date: todayStr(), type: 'expense', cardId: '' });
+const EMPTY_FORM = { desc: '', amount: '', category: 'Alimentação', date: todayStr(), type: 'expense', cardId: '' }
+
+export default function Transactions({ transactions, cards, addTransaction, editTransaction, removeTransaction }) {
+  const [filter, setFilter]     = useState('all')
+  const [catFilter, setCatFilter] = useState('')
+  const [modal, setModal]       = useState(null) // null | { mode: 'add' } | { mode: 'edit', tx }
+
+  const form = modal?.tx ?? EMPTY_FORM
+  const setForm = (updates) => setModal(prev => ({ ...prev, tx: { ...(prev.tx ?? EMPTY_FORM), ...updates } }))
 
   const filtered = transactions
     .filter(t => filter === 'all' || t.type === filter)
     .filter(t => !catFilter || t.category === catFilter)
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => b.date.localeCompare(a.date))
 
-  const totalIn  = filtered.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalOut = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const totalIn  = filtered.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+  const totalOut = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+
+  const openAdd  = () => setModal({ mode: 'add', tx: { ...EMPTY_FORM } })
+  const openEdit = (tx) => setModal({ mode: 'edit', tx: { ...tx, amount: String(tx.amount), cardId: tx.cardId || '' } })
 
   const handleSubmit = () => {
-    if (!form.desc || !form.amount) return;
-    addTransaction({ ...form, amount: parseFloat(form.amount), cardId: form.cardId || null });
-    setForm({ desc: '', amount: '', category: 'Alimentação', date: todayStr(), type: 'expense', cardId: '' });
-    setShowModal(false);
-  };
+    if (!form.desc || !form.amount) return
+    if (modal.mode === 'add') {
+      addTransaction({ ...form, amount: parseFloat(form.amount), cardId: form.cardId || null })
+    } else {
+      editTransaction(form.id, { ...form, cardId: form.cardId || null })
+    }
+    setModal(null)
+  }
 
-  const getCard = (id) => cards.find(c => c.id === id);
+  const getCard = (id) => cards.find(c => c.id === id)
+  const isEdit  = modal?.mode === 'edit'
 
   return (
     <div className="page">
       <div className="page__header">
         <h2>Lançamentos</h2>
-        <button className="btn btn--primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn--primary" onClick={openAdd}>
           <Plus size={16} /> Novo lançamento
         </button>
       </div>
@@ -40,20 +51,22 @@ export default function Transactions({ transactions, cards, addTransaction, remo
       <div className={styles.filters}>
         <div className={styles.filterGroup}>
           {['all', 'income', 'expense'].map(f => (
-            <button key={f} className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ''}`}
+            <button key={f}
+              className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ''}`}
               onClick={() => setFilter(f)}>
               {f === 'all' ? 'Todos' : f === 'income' ? 'Receitas' : 'Gastos'}
             </button>
           ))}
         </div>
-        <select className="form-select" value={catFilter} onChange={e => setCatFilter(e.target.value)}
+        <select className="form-select" value={catFilter}
+          onChange={e => setCatFilter(e.target.value)}
           style={{ width: 'auto', minWidth: 140 }}>
           <option value="">Todas categorias</option>
           {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
 
-      {/* Summary row */}
+      {/* Summary */}
       <div className={styles.summary}>
         <div className={styles.summaryItem}>
           <span style={{ color: '#0ecb81' }}>↑ Entradas</span>
@@ -73,7 +86,7 @@ export default function Transactions({ transactions, cards, addTransaction, remo
         </div>
       </div>
 
-      {/* Transaction list */}
+      {/* List */}
       <div className={styles.list}>
         {filtered.length === 0 ? (
           <div className="empty-state">
@@ -81,7 +94,7 @@ export default function Transactions({ transactions, cards, addTransaction, remo
             <p>Nenhum lançamento encontrado</p>
           </div>
         ) : filtered.map(t => {
-          const card = t.cardId ? getCard(t.cardId) : null;
+          const card = t.cardId ? getCard(t.cardId) : null
           return (
             <div key={t.id} className={`${styles.item} animate-in`}>
               <div className={styles.itemIcon}
@@ -93,7 +106,8 @@ export default function Transactions({ transactions, cards, addTransaction, remo
               <div className={styles.itemInfo}>
                 <p className={styles.itemDesc}>{t.desc}</p>
                 <div className={styles.itemMeta}>
-                  <span className="badge" style={{ background: `${CATEGORY_COLORS[t.category]}20`, color: CATEGORY_COLORS[t.category] }}>
+                  <span className="badge"
+                    style={{ background: `${CATEGORY_COLORS[t.category]}20`, color: CATEGORY_COLORS[t.category] }}>
                     {t.category}
                   </span>
                   {card && (
@@ -105,29 +119,37 @@ export default function Transactions({ transactions, cards, addTransaction, remo
                 </div>
               </div>
               <div className={styles.itemRight}>
-                <p className={styles.itemAmount} style={{ color: t.type === 'income' ? '#0ecb81' : '#f03e3e' }}>
+                <p className={styles.itemAmount}
+                  style={{ color: t.type === 'income' ? '#0ecb81' : '#f03e3e' }}>
                   {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
                 </p>
-                <button className="btn btn--icon btn--ghost" onClick={() => removeTransaction(t.id)}>
-                  <Trash2 size={14} />
+                <button className="btn btn--icon btn--ghost" onClick={() => openEdit(t)} title="Editar">
+                  <Pencil size={13} />
+                </button>
+                <button className="btn btn--icon btn--ghost" onClick={() => removeTransaction(t.id)} title="Excluir">
+                  <Trash2 size={13} />
                 </button>
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
-      {/* Modal */}
-      {showModal && (
-        <Modal title="Novo Lançamento" onClose={() => setShowModal(false)}>
+      {/* Modal add/edit */}
+      {modal && (
+        <Modal title={isEdit ? 'Editar Lançamento' : 'Novo Lançamento'} onClose={() => setModal(null)}>
           <div className="form-group">
             <label>Tipo</label>
             <div className={styles.typeSwitch}>
               {['expense', 'income'].map(t => (
                 <button key={t}
                   className={`${styles.typeSwitchBtn} ${form.type === t ? styles.typeSwitchActive : ''}`}
-                  style={form.type === t ? { background: t === 'income' ? 'rgba(14,203,129,0.2)' : 'rgba(240,62,62,0.2)', borderColor: t === 'income' ? '#0ecb81' : '#f03e3e', color: t === 'income' ? '#0ecb81' : '#f03e3e' } : {}}
-                  onClick={() => setForm({ ...form, type: t })}>
+                  style={form.type === t
+                    ? { background: t === 'income' ? 'rgba(14,203,129,0.2)' : 'rgba(240,62,62,0.2)',
+                        borderColor: t === 'income' ? '#0ecb81' : '#f03e3e',
+                        color: t === 'income' ? '#0ecb81' : '#f03e3e' }
+                    : {}}
+                  onClick={() => setForm({ type: t })}>
                   {t === 'expense' ? '↓ Gasto' : '↑ Receita'}
                 </button>
               ))}
@@ -135,40 +157,46 @@ export default function Transactions({ transactions, cards, addTransaction, remo
           </div>
           <div className="form-group">
             <label>Descrição</label>
-            <input className="form-input" value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })} placeholder="Ex: Supermercado" />
+            <input className="form-input" value={form.desc}
+              onChange={e => setForm({ desc: e.target.value })} placeholder="Ex: Supermercado" />
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Valor (R$)</label>
               <input className="form-input" type="number" min="0" step="0.01" value={form.amount}
-                onChange={e => setForm({ ...form, amount: e.target.value })} placeholder="0,00" />
+                onChange={e => setForm({ amount: e.target.value })} placeholder="0,00" />
             </div>
             <div className="form-group">
               <label>Data</label>
-              <input className="form-input" type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+              <input className="form-input" type="date" value={form.date}
+                onChange={e => setForm({ date: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Categoria</label>
-              <select className="form-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+              <select className="form-select" value={form.category}
+                onChange={e => setForm({ category: e.target.value })}>
                 {CATEGORIES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>Cartão (opcional)</label>
-              <select className="form-select" value={form.cardId} onChange={e => setForm({ ...form, cardId: e.target.value })}>
+              <select className="form-select" value={form.cardId}
+                onChange={e => setForm({ cardId: e.target.value })}>
                 <option value="">Nenhum / Débito</option>
                 {cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
           </div>
           <div className="form-actions">
-            <button className="btn btn--secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-            <button className="btn btn--primary" onClick={handleSubmit}>Salvar</button>
+            <button className="btn btn--secondary" onClick={() => setModal(null)}>Cancelar</button>
+            <button className="btn btn--primary" onClick={handleSubmit}>
+              {isEdit ? 'Salvar alterações' : 'Salvar'}
+            </button>
           </div>
         </Modal>
       )}
     </div>
-  );
+  )
 }

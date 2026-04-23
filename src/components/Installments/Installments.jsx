@@ -1,37 +1,71 @@
-import { useState } from 'react';
-import { Plus, Trash2, CreditCard, CheckCircle } from 'lucide-react';
-import Modal from '../Shared/Modal';
-import { formatCurrency, formatDate, todayStr } from '../../data/store';
-import styles from './Installments.module.scss';
+import { useState } from 'react'
+import { Plus, Trash2, Pencil, CreditCard, CheckCircle } from 'lucide-react'
+import Modal from '../Shared/Modal'
+import { formatCurrency, todayStr } from '../../data/store'
+import styles from './Installments.module.scss'
 
-export default function Installments({ installments, cards, addInstallment, payInstallment, removeInstallment }) {
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ desc: '', monthly: '', totalInstallments: '', dueDay: '15', cardId: '', startDate: todayStr() });
+function CheckIcon({ size }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
 
-  const totalMonthly   = installments.reduce((s, i) => s + i.monthly, 0);
-  const totalRemaining = installments.reduce((s, i) => s + (i.totalInstallments - i.paid) * i.monthly, 0);
-  const totalOriginal  = installments.reduce((s, i) => s + i.totalInstallments * i.monthly, 0);
+const EMPTY_FORM = { desc: '', monthly: '', totalInstallments: '', dueDay: '15', cardId: '', startDate: todayStr() }
 
-  const getCard = (id) => cards.find(c => c.id === id);
+export default function Installments({ installments, cards, addInstallment, editInstallment, payInstallment, removeInstallment }) {
+  const [modal, setModal] = useState(null) // null | { mode, inst? }
+
+  const form = modal?.inst ?? EMPTY_FORM
+  const setForm = (updates) => setModal(prev => ({ ...prev, inst: { ...(prev.inst ?? EMPTY_FORM), ...updates } }))
+
+  const totalMonthly   = installments.reduce((s, i) => s + i.monthly, 0)
+  const totalRemaining = installments.reduce((s, i) => s + (i.totalInstallments - i.paid) * i.monthly, 0)
+  const totalOriginal  = installments.reduce((s, i) => s + i.totalInstallments * i.monthly, 0)
+
+  const getCard = (id) => cards.find(c => c.id === id)
+
+  const openAdd  = () => setModal({ mode: 'add', inst: { ...EMPTY_FORM } })
+  const openEdit = (inst) => setModal({
+    mode: 'edit',
+    inst: {
+      ...inst,
+      monthly: String(inst.monthly),
+      totalInstallments: String(inst.totalInstallments),
+      dueDay: String(inst.dueDay),
+      cardId: inst.cardId || '',
+    },
+  })
 
   const handleSubmit = () => {
-    if (!form.desc || !form.monthly || !form.totalInstallments) return;
-    addInstallment({
-      ...form,
-      monthly: parseFloat(form.monthly),
-      totalInstallments: parseInt(form.totalInstallments),
-      dueDay: parseInt(form.dueDay),
-      cardId: form.cardId || null,
-    });
-    setForm({ desc: '', monthly: '', totalInstallments: '', dueDay: '15', cardId: '', startDate: todayStr() });
-    setShowModal(false);
-  };
+    if (!form.desc || !form.monthly || !form.totalInstallments) return
+    if (modal.mode === 'add') {
+      addInstallment({
+        ...form,
+        monthly: parseFloat(form.monthly),
+        totalInstallments: parseInt(form.totalInstallments),
+        dueDay: parseInt(form.dueDay),
+        cardId: form.cardId || null,
+        total: parseFloat(form.monthly) * parseInt(form.totalInstallments),
+      })
+    } else {
+      editInstallment(form.id, {
+        ...form,
+        cardId: form.cardId || null,
+      })
+    }
+    setModal(null)
+  }
+
+  const isEdit = modal?.mode === 'edit'
 
   return (
     <div className="page">
       <div className="page__header">
         <h2>Parcelas</h2>
-        <button className="btn btn--primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn--primary" onClick={openAdd}>
           <Plus size={16} /> Nova parcela
         </button>
       </div>
@@ -60,16 +94,17 @@ export default function Installments({ installments, cards, addInstallment, payI
             <p>Nenhuma parcela cadastrada</p>
           </div>
         ) : installments.map(inst => {
-          const card = inst.cardId ? getCard(inst.cardId) : null;
-          const pct = (inst.paid / inst.totalInstallments) * 100;
-          const remaining = (inst.totalInstallments - inst.paid) * inst.monthly;
-          const done = inst.paid >= inst.totalInstallments;
+          const card = inst.cardId ? getCard(inst.cardId) : null
+          const pct  = (inst.paid / inst.totalInstallments) * 100
+          const remaining = (inst.totalInstallments - inst.paid) * inst.monthly
+          const done = inst.paid >= inst.totalInstallments
 
           return (
             <div key={inst.id} className={`${styles.instCard} animate-in`}
               style={{ borderColor: done ? 'rgba(14,203,129,0.3)' : card ? `${card.color}30` : undefined }}>
               <div className={styles.instHeader}>
-                <div className={styles.instIconWrap} style={{ background: card ? `${card.color}20` : 'rgba(124,92,252,0.12)' }}>
+                <div className={styles.instIconWrap}
+                  style={{ background: card ? `${card.color}20` : 'rgba(124,92,252,0.12)' }}>
                   <CreditCard size={18} color={card ? card.color : '#7c5cfc'} />
                 </div>
                 <div className={styles.instTitle}>
@@ -80,8 +115,11 @@ export default function Installments({ installments, cards, addInstallment, payI
                     </span>
                   )}
                 </div>
-                <button className="btn btn--icon btn--ghost" onClick={() => removeInstallment(inst.id)}>
-                  <Trash2 size={14} />
+                <button className="btn btn--icon btn--ghost" onClick={() => openEdit(inst)} title="Editar">
+                  <Pencil size={13} />
+                </button>
+                <button className="btn btn--icon btn--ghost" onClick={() => removeInstallment(inst.id)} title="Excluir">
+                  <Trash2 size={13} />
                 </button>
               </div>
 
@@ -92,7 +130,8 @@ export default function Installments({ installments, cards, addInstallment, payI
                   <span>{pct.toFixed(0)}%</span>
                 </div>
                 <div className={`progress ${done ? 'progress--green' : ''}`}>
-                  <div className="progress__fill" style={{ width: `${pct}%`, ...(card ? { background: card.color } : {}) }} />
+                  <div className="progress__fill"
+                    style={{ width: `${pct}%`, ...(card ? { background: card.color } : {}) }} />
                 </div>
               </div>
 
@@ -112,10 +151,9 @@ export default function Installments({ installments, cards, addInstallment, payI
                 </div>
               </div>
 
-              {/* Action */}
               {!done ? (
                 <button className={styles.payBtn} onClick={() => payInstallment(inst.id)}>
-                  <Check size={14} /> Registrar parcela paga
+                  <CheckIcon size={14} /> Registrar parcela paga
                 </button>
               ) : (
                 <div className={styles.doneTag}>
@@ -123,44 +161,46 @@ export default function Installments({ installments, cards, addInstallment, payI
                 </div>
               )}
             </div>
-          );
+          )
         })}
       </div>
 
-      {showModal && (
-        <Modal title="Nova Compra Parcelada" onClose={() => setShowModal(false)}>
+      {/* Modal */}
+      {modal && (
+        <Modal title={isEdit ? 'Editar Parcela' : 'Nova Compra Parcelada'} onClose={() => setModal(null)}>
           <div className="form-group">
             <label>Descrição do produto</label>
-            <input className="form-input" value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })}
-              placeholder="Ex: iPhone 16 Pro" />
+            <input className="form-input" value={form.desc}
+              onChange={e => setForm({ desc: e.target.value })} placeholder="Ex: iPhone 16 Pro" />
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Valor por parcela (R$)</label>
               <input className="form-input" type="number" min="0" step="0.01" value={form.monthly}
-                onChange={e => setForm({ ...form, monthly: e.target.value })} placeholder="0,00" />
+                onChange={e => setForm({ monthly: e.target.value })} placeholder="0,00" />
             </div>
             <div className="form-group">
               <label>Nº de parcelas</label>
               <input className="form-input" type="number" min="1" value={form.totalInstallments}
-                onChange={e => setForm({ ...form, totalInstallments: e.target.value })} placeholder="Ex: 12" />
+                onChange={e => setForm({ totalInstallments: e.target.value })} placeholder="Ex: 12" />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>Dia de vencimento</label>
               <input className="form-input" type="number" min="1" max="31" value={form.dueDay}
-                onChange={e => setForm({ ...form, dueDay: e.target.value })} />
+                onChange={e => setForm({ dueDay: e.target.value })} />
             </div>
             <div className="form-group">
               <label>Data da compra</label>
               <input className="form-input" type="date" value={form.startDate}
-                onChange={e => setForm({ ...form, startDate: e.target.value })} />
+                onChange={e => setForm({ startDate: e.target.value })} />
             </div>
           </div>
           <div className="form-group">
             <label>Cartão usado</label>
-            <select className="form-select" value={form.cardId} onChange={e => setForm({ ...form, cardId: e.target.value })}>
+            <select className="form-select" value={form.cardId}
+              onChange={e => setForm({ cardId: e.target.value })}>
               <option value="">Selecionar cartão</option>
               {cards.map(c => <option key={c.id} value={c.id}>{c.name} ···{c.lastFour}</option>)}
             </select>
@@ -172,20 +212,13 @@ export default function Installments({ installments, cards, addInstallment, payI
             </div>
           )}
           <div className="form-actions">
-            <button className="btn btn--secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-            <button className="btn btn--primary" onClick={handleSubmit}>Salvar</button>
+            <button className="btn btn--secondary" onClick={() => setModal(null)}>Cancelar</button>
+            <button className="btn btn--primary" onClick={handleSubmit}>
+              {isEdit ? 'Salvar alterações' : 'Salvar'}
+            </button>
           </div>
         </Modal>
       )}
     </div>
-  );
-}
-
-function Check({ size, children }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-      strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
+  )
 }

@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import {
-  LayoutDashboard, ArrowLeftRight, BellRing,
-  CreditCard, TrendingUp, Wallet, HandCoins,
-  Building2, CalendarDays, Menu, X, LogOut,
+  LayoutDashboard, ArrowLeftRight, BellRing, CreditCard,
+  TrendingUp, Wallet, HandCoins, Building2, CalendarDays,
+  Menu, X, LogOut, Sun, Moon,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 import { signOut } from '../../lib/supabase'
 import styles from './Layout.module.scss'
 
@@ -22,10 +23,11 @@ const NAV = [
 ]
 
 export default function Layout({ children }) {
-  const [open, setOpen]   = useState(false)
-  const { user, profile } = useAuth()
-  const displayName       = profile?.name || user?.email?.split('@')[0] || 'Usuário'
-  const initials          = displayName.slice(0, 2).toUpperCase()
+  const [open, setOpen]       = useState(false)
+  const { user, profile }     = useAuth()
+  const { isDark, toggle }    = useTheme()
+  const displayName           = profile?.name || user?.email?.split('@')[0] || 'Usuário'
+  const initials              = displayName.slice(0, 2).toUpperCase()
 
   return (
     <div className={styles.wrap}>
@@ -34,12 +36,27 @@ export default function Layout({ children }) {
       </button>
 
       <aside className={`${styles.sidebar} ${open ? styles.sidebarOpen : ''}`}>
-        <div className={styles.logo}>
-          <span className={styles.logoIcon}>₢</span>
-          <div>
-            <p className={styles.logoTitle}>Finanças</p>
-            <p className={styles.logoSub}>Painel Pessoal</p>
+        {/* Logo + theme toggle */}
+        <div className={styles.logoRow}>
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}>₢</span>
+            <div>
+              <p className={styles.logoTitle}>Finanças</p>
+              <p className={styles.logoSub}>Painel Pessoal</p>
+            </div>
           </div>
+         <button 
+            className={`${styles.themeBtn} ${isDark ? styles.themeBtnDark : styles.themeBtnLight}`} 
+            onClick={toggle} 
+            aria-label="Trocar tema"
+          >
+            <div className={styles.themePill} />
+            
+            <div className={styles.themeIcons}>
+              <Sun size={14} className={styles.sunIcon} />
+              <Moon size={14} className={styles.moonIcon} />
+            </div>
+          </button>
         </div>
 
         <nav className={styles.nav}>

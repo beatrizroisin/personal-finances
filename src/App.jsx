@@ -47,17 +47,19 @@ function AppInner() {
             cards={f.cards}
             bankAccounts={f.bankAccounts}
             addTransaction={f.addTransaction}
+            editTransaction={f.editTransaction}
             removeTransaction={f.removeTransaction}
           />
         } />
         <Route path="/contas" element={
           <Bills bills={f.bills} addBill={f.addBill}
+            editBill={f.editBill}
             toggleBill={f.toggleBill} removeBill={f.removeBill} />
         } />
         <Route path="/parcelas" element={
           <Installments installments={f.installments} cards={f.cards}
-            addInstallment={f.addInstallment} payInstallment={f.payInstallment}
-            removeInstallment={f.removeInstallment} />
+            addInstallment={f.addInstallment} editInstallment={f.editInstallment}
+            payInstallment={f.payInstallment} removeInstallment={f.removeInstallment} />
         } />
         <Route path="/cartoes" element={
           <Cards cards={f.cards} transactions={f.transactions} installments={f.installments}
@@ -65,7 +67,8 @@ function AppInner() {
         } />
         <Route path="/investimentos" element={
           <Investments investments={f.investments}
-            addInvestment={f.addInvestment} removeInvestment={f.removeInvestment} />
+            addInvestment={f.addInvestment} editInvestment={f.editInvestment}
+            removeInvestment={f.removeInvestment} />
         } />
         <Route path="/a-receber" element={
           <Receivables receivables={f.receivables}
@@ -78,6 +81,7 @@ function AppInner() {
             transactions={f.transactions}
             bills={f.bills}
             installments={f.installments}
+            receivables={f.receivables}
           />
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
