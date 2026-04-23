@@ -21,7 +21,7 @@
 }
 
 .mostUsed {
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   padding: 14px 16px;

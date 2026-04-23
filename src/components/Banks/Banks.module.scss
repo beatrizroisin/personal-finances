@@ -191,7 +191,7 @@
 
 // ─── BALANCE SECTION ─────────────────────────────────────────────────────────
 .balanceSection {
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   padding: 16px;
@@ -353,7 +353,7 @@
   transition: background $transition;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: $bg-base; }
+  &:hover { background: var(--bg-base); }
 }
 
 .histDate {

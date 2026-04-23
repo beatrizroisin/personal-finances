@@ -27,7 +27,7 @@
   width: 30px;
   height: 30px;
   border-radius: $radius-sm;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   color: $text-muted;
   display: flex;
@@ -58,7 +58,7 @@
   font-size: 12px;
   font-weight: 600;
   font-family: $font-body;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   color: $text-muted;
   cursor: pointer;
@@ -210,7 +210,7 @@
   font-weight: 700;
   padding: 1px 7px;
   border-radius: 100px;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   color: $text-muted;
 }
@@ -240,7 +240,7 @@
   transition: background $transition;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: $bg-base; }
+  &:hover { background: var(--bg-base); }
 }
 
 .itemRowPaid {

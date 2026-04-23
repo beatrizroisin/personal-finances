@@ -98,7 +98,7 @@
 .dueDay {
   font-size: 11px;
   color: $text-muted;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: 100px;
   padding: 1px 8px;

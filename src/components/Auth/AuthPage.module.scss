@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  background: $bg-base;
+  background: var(--bg-base);
   position: relative;
   overflow: hidden;
 }
@@ -91,7 +91,7 @@
 .tabs {
   display: flex;
   gap: 0;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-sm;
   padding: 4px;
@@ -144,7 +144,7 @@
 
   input {
     width: 100%;
-    background: $bg-base;
+    background: var(--bg-base);
     border: 1px solid $border;
     border-radius: $radius-sm;
     padding: 12px 14px;

@@ -158,7 +158,7 @@
   gap: 3px;
   font-size: 12px;
   color: $text-muted;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: 100px;
   padding: 1px 8px;
@@ -252,7 +252,7 @@
 
 // ─── INSTALLMENT LIST ────────────────────────────────────────────────────────
 .installmentList {
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   overflow: hidden;
@@ -336,7 +336,7 @@
 
 // ─── PEOPLE LIST ─────────────────────────────────────────────────────────────
 .peopleList {
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   overflow: hidden;
@@ -471,7 +471,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   padding: 12px;
@@ -518,7 +518,7 @@
 .splitTypeToggle {
   display: flex;
   gap: 0;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-sm;
   padding: 4px;
@@ -548,7 +548,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: $radius-md;
   padding: 12px;

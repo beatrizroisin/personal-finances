@@ -143,7 +143,7 @@
 }
 
 .invRate {
-  background: $bg-base;
+  background: var(--bg-base);
   border: 1px solid $border;
   border-radius: 100px;
   padding: 2px 8px;
