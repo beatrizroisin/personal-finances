@@ -38,15 +38,15 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  border: 1px solid $border;
-  background: $bg-surface;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
   cursor: pointer;
   overflow: hidden; 
   position: relative;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: $text-primary;
+    border-color: var(--text-primary);
   }
 }
 
