@@ -35,14 +35,20 @@
   }
 }
 .themeBtn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  --btn-width: 56px;
+  --btn-height: 28px;
+  --padding: 4px;
+  
+  width: var(--btn-width);
+  height: var(--btn-height);
+  border-radius: 20px; 
   border: 1px solid var(--border);
   background: var(--bg-surface);
   cursor: pointer;
-  overflow: hidden; 
   position: relative;
+  padding: 0;
+  display: flex;
+  align-items: center;
   transition: all 0.3s ease;
 
   &:hover {
@@ -50,28 +56,50 @@
   }
 }
 
-.themeBtnInner {
+.themePill {
+  position: absolute;
+  top: var(--padding);
+  left: var(--padding);
+  width: calc(var(--btn-height) - (var(--padding) * 2));
+  height: calc(var(--btn-height) - (var(--padding) * 2));
+  background: $text-primary; 
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  z-index: 1;
+}
+
+.themeIcons {
+  position: relative;
+  z-index: 2; 
+  width: 100%;
   display: flex;
-  flex-direction: column; 
+  justify-content: space-around; 
   align-items: center;
-  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1); 
+  pointer-events: none; 
+}
 
-  svg {
-    flex-shrink: 0;
-    margin: 9px 0; 
+.sunIcon, .moonIcon {
+  transition: color 0.3s ease;
+}
+
+.themeBtnLight {
+  .themePill {
+    transform: translateX(0);
+    background: #ff922b; 
   }
+  .sunIcon { color: white; }
+  .moonIcon { color: $text-muted; }
 }
 
-.themeBtnLight .themeBtnInner {
-  transform: translateY(0);
-}
 
-.themeBtnDark .themeBtnInner {
-  transform: translateY(-34px); 
+.themeBtnDark {
+  .themePill {
+    transform: translateX(calc(var(--btn-width) - var(--btn-height)));
+    background: #7c5cfc; 
+  }
+  .sunIcon { color: $text-muted; }
+  .moonIcon { color: white; }
 }
-
-.sunIcon { color: #f9d71c; }
-.moonIcon { color: #8888bb; }
 
 .overlay {
   display: none;

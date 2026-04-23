@@ -45,14 +45,16 @@ export default function Layout({ children }) {
               <p className={styles.logoSub}>Painel Pessoal</p>
             </div>
           </div>
-          <button 
+         <button 
             className={`${styles.themeBtn} ${isDark ? styles.themeBtnDark : styles.themeBtnLight}`} 
             onClick={toggle} 
-            title={isDark ? 'Modo claro' : 'Modo escuro'}
+            aria-label="Trocar tema"
           >
-            <div className={styles.themeBtnInner}>
-              <Sun size={15} className={styles.sunIcon} />
-              <Moon size={15} className={styles.moonIcon} />
+            <div className={styles.themePill} />
+            
+            <div className={styles.themeIcons}>
+              <Sun size={14} className={styles.sunIcon} />
+              <Moon size={14} className={styles.moonIcon} />
             </div>
           </button>
         </div>
