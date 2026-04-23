@@ -62,7 +62,7 @@
   left: var(--padding);
   width: calc(var(--btn-height) - (var(--padding) * 2));
   height: calc(var(--btn-height) - (var(--padding) * 2));
-  background: $text-primary; 
+  background: var(--text-primary); 
   border-radius: 50%;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   z-index: 1;
