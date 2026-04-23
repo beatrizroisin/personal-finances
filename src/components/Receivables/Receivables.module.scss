@@ -589,3 +589,13 @@
 
   @media (max-width: 460px) { grid-template-columns: 1fr; }
 }
+
+.exportBtn{
+    color: #7c5cfc;
+    font-weight: 700;
+    text-decoration: underline;
+
+    svg{
+      stroke: #7c5cfc;
+    }
+}
