@@ -322,9 +322,9 @@ input, select, textarea { font-family: $font-body; }
   &__fill {
     height: 100%;
     border-radius: 3px;
-    background: linear-gradient(90deg, $accent, color.adjust(#7c5cfc, 15%));
+    background: linear-gradient(90deg, $accent, color.adjust(#7c5cfc, $lightness: 15%));
     transition: width $transition-slow;
   }
-  &--green .progress__fill { background: linear-gradient(90deg, $green, color.adjust(#0ecb81, 15%)); }
-  &--orange .progress__fill { background: linear-gradient(90deg, $orange, color.adjust(#ff922b, 15%)); }
+  &--green .progress__fill { background: linear-gradient(90deg, $green, color.adjust(#0ecb81, $lightness: 15%)); }
+  &--orange .progress__fill { background: linear-gradient(90deg, $orange, color.adjust(#ff922b, $lightness: 15%)); }
 }
