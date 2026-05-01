@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { generateId, todayStr, currentMonthKey, resetRecurringIfNewMonth } from '../data/store'
+import { generateId, todayStr, currentMonthKey, resetRecurringIfNewMonth, SEED_RECURRING_INCOMES } from '../data/store'
 
 // ─── DB ↔ APP field mappings ─────────────────────────────────────────────────
 const fromDb = {
+  recurring_incomes: r => ({ id: r.id, desc: r.description, amount: r.amount, day: r.day, category: r.category, active: r.active }),
   bank_accounts: r => ({
     id: r.id, name: r.name, bank: r.bank, type: r.type,
     color: r.color, balance: r.balance, agency: r.agency,
@@ -14,8 +15,8 @@ const fromDb = {
     id: r.id, bankAccountId: r.bank_account_id,
     balance: r.balance, recordedAt: r.recorded_at,
   }),
-  cards:        r => ({ id: r.id, name: r.name, bank: r.bank, limit: r.card_limit, color: r.color, lastFour: r.last_four }),
-  transactions: r => ({ id: r.id, desc: r.description, amount: r.amount, category: r.category, date: r.date, type: r.type, cardId: r.card_id, bankAccountId: r.bank_account_id }),
+  cards:        r => ({ id: r.id, name: r.name, bank: r.bank, limit: r.card_limit, color: r.color, lastFour: r.last_four, closingDay: r.closing_day ?? 20 }),
+  transactions: r => ({ id: r.id, desc: r.description, amount: r.amount, category: r.category, date: r.date, purchaseDate: r.purchase_date ?? r.date, billingMonth: r.billing_month ?? r.date?.slice(0,7), type: r.type, cardId: r.card_id, bankAccountId: r.bank_account_id }),
   bills:        r => ({ id: r.id, desc: r.description, amount: r.amount, dueDay: r.due_day, paid: r.paid, paidMonth: r.paid_month, category: r.category, recurring: r.recurring }),
   installments: r => ({ id: r.id, desc: r.description, monthly: r.monthly, totalInstallments: r.total_installments, paid: r.paid, dueDay: r.due_day, cardId: r.card_id, startDate: r.start_date }),
   investments:  r => ({ id: r.id, desc: r.description, amount: r.amount, returnPct: r.return_pct, type: r.type, startDate: r.start_date, institution: r.institution }),
@@ -23,6 +24,7 @@ const fromDb = {
 }
 
 const toDb = {
+  recurring_incomes: (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, amount: r.amount, day: r.day, category: r.category, active: r.active }),
   bank_accounts: (r, uid) => ({
     id: r.id, user_id: uid, name: r.name, bank: r.bank, type: r.type,
     color: r.color, balance: r.balance, agency: r.agency,
@@ -32,8 +34,8 @@ const toDb = {
     id: r.id, user_id: uid, bank_account_id: r.bankAccountId,
     balance: r.balance, recorded_at: r.recordedAt,
   }),
-  cards:        (r, uid) => ({ id: r.id, user_id: uid, name: r.name, bank: r.bank, card_limit: r.limit, color: r.color, last_four: r.lastFour }),
-  transactions: (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, amount: r.amount, category: r.category, date: r.date, type: r.type, card_id: r.cardId, bank_account_id: r.bankAccountId }),
+  cards:        (r, uid) => ({ id: r.id, user_id: uid, name: r.name, bank: r.bank, card_limit: r.limit, color: r.color, last_four: r.lastFour, closing_day: r.closingDay ?? 20 }),
+  transactions: (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, amount: r.amount, category: r.category, date: r.date, purchase_date: r.purchaseDate ?? r.date, billing_month: r.billingMonth ?? r.date?.slice(0,7), type: r.type, card_id: r.cardId, bank_account_id: r.bankAccountId }),
   bills:        (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, amount: r.amount, due_day: r.dueDay, paid: r.paid, paid_month: r.paidMonth ?? null, category: r.category, recurring: r.recurring }),
   installments: (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, monthly: r.monthly, total_installments: r.totalInstallments, paid: r.paid, due_day: r.dueDay, card_id: r.cardId, start_date: r.startDate }),
   investments:  (r, uid) => ({ id: r.id, user_id: uid, description: r.desc, amount: r.amount, return_pct: r.returnPct, type: r.type, start_date: r.startDate, institution: r.institution }),
@@ -69,6 +71,7 @@ export function useFinance() {
   const { user } = useAuth()
   const uid = user?.id
 
+  const [recurringIncomes,setRecurringIncomes] = useState([])
   const [bankAccounts,    setBankAccounts]    = useState([])
   const [balanceHistory,  setBalanceHistory]  = useState([])
   const [cards,           setCards]           = useState([])
@@ -84,6 +87,7 @@ export function useFinance() {
     if (!uid) { setLoading(false); return }
     setLoading(true)
     Promise.all([
+      fetchTable('recurring_incomes'),
       fetchTable('bank_accounts'),
       fetchTable('balance_history'),
       fetchTable('cards'),
@@ -92,7 +96,7 @@ export function useFinance() {
       fetchTable('installments'),
       fetchTable('investments'),
       fetchTable('receivables'),
-    ]).then(([ba, bh, c, t, b, i, inv, rec]) => {
+    ]).then(([ri, ba, bh, c, t, b, i, inv, rec]) => {
       // Auto-reset recurring bills when entering a new month
       const savedMonth = localStorage.getItem('fp_last_reset_month')
       const { bills: resetBills, resetIds } = resetRecurringIfNewMonth(b, savedMonth)
@@ -100,6 +104,7 @@ export function useFinance() {
         localStorage.setItem('fp_last_reset_month', currentMonthKey())
         resetIds.forEach(id => patchRow('bills', id, { paid: false, paid_month: null }))
       }
+      setRecurringIncomes(ri)
       setBankAccounts(ba)
       setBalanceHistory(bh)
       setCards(c)
@@ -115,7 +120,7 @@ export function useFinance() {
   // ── Clear state on logout ────────────────────────────────────────────────
   useEffect(() => {
     if (!uid) {
-      setBankAccounts([]); setBalanceHistory([])
+      setRecurringIncomes([]); setBankAccounts([]); setBalanceHistory([])
       setCards([]); setTransactions([]); setBills([])
       setInstallments([]); setInvestments([]); setReceivables([])
     }
@@ -280,6 +285,34 @@ export function useFinance() {
   }, [_patchReceivable])
 
 
+  // ── RECURRING INCOMES ─────────────────────────────────────────────────────────
+  const addRecurringIncome = useCallback(async (data) => {
+    const row = { ...data, id: generateId(), active: true }
+    setRecurringIncomes(p => [...p, row])
+    await upsertRow('recurring_incomes', row, uid)
+  }, [uid])
+
+  const toggleRecurringIncome = useCallback((id) => {
+    setRecurringIncomes(prev => {
+      const ri = prev.find(r => r.id === id)
+      if (!ri) return prev
+      const newActive = !ri.active
+      patchRow('recurring_incomes', id, { active: newActive })
+      return prev.map(r => r.id === id ? { ...r, active: newActive } : r)
+    })
+  }, [])
+
+  const editRecurringIncome = useCallback(async (id, data) => {
+    const updated = { ...data, amount: parseFloat(data.amount), day: parseInt(data.day) }
+    setRecurringIncomes(prev => prev.map(r => r.id === id ? { ...r, ...updated } : r))
+    await upsertRow('recurring_incomes', { ...recurringIncomes.find(r => r.id === id), ...updated }, uid)
+  }, [uid, recurringIncomes])
+
+  const removeRecurringIncome = useCallback(async (id) => {
+    setRecurringIncomes(p => p.filter(r => r.id !== id))
+    await deleteRow('recurring_incomes', id)
+  }, [])
+
   // ── EDIT FUNCTIONS ───────────────────────────────────────────────────────────
 
   const editTransaction = useCallback(async (id, data) => {
@@ -313,8 +346,10 @@ export function useFinance() {
 
   return {
     loading,
+    recurringIncomes,
     bankAccounts, balanceHistory,
     cards, transactions, bills, installments, investments, receivables,
+    addRecurringIncome, editRecurringIncome, toggleRecurringIncome, removeRecurringIncome,
     addBankAccount, updateBankBalance, removeBankAccount,
     addCard, removeCard,
     addTransaction, editTransaction, removeTransaction,

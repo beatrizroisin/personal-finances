@@ -20,6 +20,7 @@ const NAV = [
   { to: '/cartoes',       icon: Wallet,          label: 'Cartões' },
   { to: '/investimentos', icon: TrendingUp,      label: 'Investimentos' },
   { to: '/a-receber',     icon: HandCoins,       label: 'A Receber' },
+  { to: '/receitas-fixas', icon: Repeat2,          label: 'Receitas Fixas' },
 ]
 
 export default function Layout({ children }) {
@@ -45,17 +46,8 @@ export default function Layout({ children }) {
               <p className={styles.logoSub}>Painel Pessoal</p>
             </div>
           </div>
-         <button 
-            className={`${styles.themeBtn} ${isDark ? styles.themeBtnDark : styles.themeBtnLight}`} 
-            onClick={toggle} 
-            aria-label="Trocar tema"
-          >
-            <div className={styles.themePill} />
-            
-            <div className={styles.themeIcons}>
-              <Sun size={14} className={styles.sunIcon} />
-              <Moon size={14} className={styles.moonIcon} />
-            </div>
+          <button className={styles.themeBtn} onClick={toggle} title={isDark ? 'Modo claro' : 'Modo escuro'}>
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
         </div>
 

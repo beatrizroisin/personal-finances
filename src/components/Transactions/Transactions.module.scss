@@ -1,4 +1,4 @@
-@use '../../styles/variables.scss' as *;
+@use '../../styles/variables' as *;
 
 .filters {
   display: flex;
@@ -11,8 +11,8 @@
 .filterGroup {
   display: flex;
   gap: 6px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: $bg-card;
+  border: 1px solid $border;
   border-radius: $radius-sm;
   padding: 4px;
 }
@@ -22,10 +22,10 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: $text-muted;
   transition: all $transition;
 
-  &:hover { color: var(--text-primary); }
+  &:hover { color: $text-primary; }
 }
 
 .filterBtnActive {
@@ -38,8 +38,8 @@
   align-items: center;
   gap: 20px;
   padding: 16px 20px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: $bg-card;
+  border: 1px solid $border;
   border-radius: $radius-md;
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -51,7 +51,7 @@
   flex-direction: column;
   gap: 2px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: $text-muted;
 
   strong { font-size: 15px; font-weight: 700; }
 }
@@ -59,7 +59,7 @@
 .summaryDivider {
   width: 1px;
   height: 36px;
-  background: var(--border);
+  background: $border;
 }
 
 .list {
@@ -73,14 +73,14 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: $bg-card;
+  border: 1px solid $border;
   border-radius: $radius-md;
   transition: all $transition;
 
   &:hover {
-    border-color: var(--border)-light;
-    background: var(--bg-surface)-hover;
+    border-color: $border-light;
+    background: $bg-card-hover;
   }
 }
 
@@ -99,7 +99,7 @@
 .itemDesc {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: $text-primary;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -124,7 +124,7 @@
 
 .itemDate {
   font-size: 11px;
-  color: var(--text-muted);
+  color: $text-muted;
 }
 
 .itemRight {
@@ -151,12 +151,48 @@
   border-radius: $radius-sm;
   font-size: 13px;
   font-weight: 600;
-  background: var(--bg-base);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: $bg-base;
+  border: 1px solid $border;
+  color: $text-muted;
   transition: all $transition;
 
-  &:hover { color: var(--text-primary); }
+  &:hover { color: $text-primary; }
 }
 
 .typeSwitchActive { }
+
+// ─── BILLING TAGS ─────────────────────────────────────────────────────────────
+.billingTag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: rgba(255, 146, 43, 0.1);
+  border: 1px solid rgba(255, 146, 43, 0.25);
+  color: #ff922b;
+}
+
+.billingPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+
+  strong { font-weight: 700; }
+}
+
+.billingPreviewWarn {
+  background: rgba(255, 146, 43, 0.1);
+  border: 1px solid rgba(255, 146, 43, 0.25);
+  color: #ff922b;
+}
+
+.billingPreviewOk {
+  background: rgba(14, 203, 129, 0.08);
+  border: 1px solid rgba(14, 203, 129, 0.2);
+  color: #0ecb81;
+}

@@ -7,7 +7,7 @@ import styles from './Cards.module.scss';
 
 export default function Cards({ cards, transactions, installments, addCard, removeCard }) {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: '', bank: 'nubank', limit: '', lastFour: '', color: '#820ad1' });
+  const [form, setForm] = useState({ name: '', bank: 'nubank', limit: '', lastFour: '', color: '#820ad1', closingDay: '20' });
 
   // Per-card spend from transactions this month
   const cardStats = useMemo(() => {
