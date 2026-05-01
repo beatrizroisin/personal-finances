@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, ArrowLeftRight, BellRing, CreditCard,
-  TrendingUp, Wallet, HandCoins, Building2, CalendarDays,
+  TrendingUp, Wallet, Coins, Building, Calendar,
   Menu, X, LogOut, Sun, Moon,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -12,14 +12,14 @@ import styles from './Layout.module.scss'
 
 const NAV = [
   { to: '/',              icon: LayoutDashboard, label: 'Visão Geral' },
-  { to: '/bancos',        icon: Building2,       label: 'Bancos' },
-  { to: '/fluxo',         icon: CalendarDays,    label: 'Fluxo de Caixa' },
+  { to: '/bancos',        icon: Building,       label: 'Bancos' },
+  { to: '/fluxo',         icon: Calendar,    label: 'Fluxo de Caixa' },
   { to: '/lancamentos',   icon: ArrowLeftRight,  label: 'Lançamentos' },
   { to: '/contas',        icon: BellRing,        label: 'Contas a Pagar' },
   { to: '/parcelas',      icon: CreditCard,      label: 'Parcelas' },
   { to: '/cartoes',       icon: Wallet,          label: 'Cartões' },
   { to: '/investimentos', icon: TrendingUp,      label: 'Investimentos' },
-  { to: '/a-receber',     icon: HandCoins,       label: 'A Receber' },
+  { to: '/a-receber',     icon: Coins,       label: 'A Receber' },
   { to: '/receitas-fixas', icon: RefreshCcw,          label: 'Receitas Fixas' },
 ]
 

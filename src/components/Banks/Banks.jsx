@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Trash2, Pencil, Check, X, TrendingUp, TrendingDown, Building2, History } from 'lucide-react'
+import { Plus, Trash2, Pencil, Check, X, TrendingUp, TrendingDown, Building, History } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -114,7 +114,7 @@ function AddBankModal({ onClose, onSave }) {
       {/* Preview card */}
       <div className={styles.cardPreview} style={{ background: `linear-gradient(135deg, ${form.color}dd, ${form.color}88)` }}>
         <div className={styles.cardPreviewTop}>
-          <Building2 size={20} color="rgba(255,255,255,0.8)" />
+          <Building size={20} color="rgba(255,255,255,0.8)" />
           <span className={styles.cardPreviewType}>{form.type}</span>
         </div>
         <p className={styles.cardPreviewName}>{form.name || 'Nome da conta'}</p>
@@ -289,7 +289,7 @@ export default function Banks({ bankAccounts, balanceHistory, addBankAccount, up
       <div className={styles.grid}>
         {bankAccounts.length === 0 ? (
           <div className="empty-state" style={{ gridColumn: '1/-1' }}>
-            <div className="icon"><Building2 size={36} opacity={0.3} /></div>
+            <div className="icon"><Building size={36} opacity={0.3} /></div>
             <p>Nenhuma conta bancária cadastrada.<br />Adicione suas contas para ver o saldo total.</p>
           </div>
         ) : bankAccounts.map(acc => {

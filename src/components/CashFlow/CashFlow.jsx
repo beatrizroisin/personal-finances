@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import {
   TrendingUp, TrendingDown, RefreshCcw, CreditCard,
-  ArrowLeftRight, ChevronLeft, ChevronRight, Check, HandCoins,
+  ArrowLeftRight, ChevronLeft, ChevronRight, Check, Coins,
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
 import { formatCurrency, formatDate, getMonthRange, buildMonthCashflow } from '../../data/store'
@@ -281,7 +281,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
           {/* A Receber neste mês */}
           {cf.receivables.length > 0 && (
             <div className={`card ${styles.detailCard}`}>
-              <SectionHeader icon={HandCoins} title="A Receber"
+              <SectionHeader icon={Coins} title="A Receber"
                 color="#20c997" total={cf.receivablesTotal} count={cf.receivables.length} />
               <div className={styles.itemList}>
                 {[...cf.receivables].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || '')).map(r => (

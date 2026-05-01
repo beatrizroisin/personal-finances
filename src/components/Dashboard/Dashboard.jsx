@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  TrendingUp, TrendingDown, Wallet, AlertCircle, CreditCard, HandCoins, Building2
+  TrendingUp, TrendingDown, Wallet, AlertCircle, CreditCard, Coins, Building
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -140,7 +140,7 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
           {recStats.overdueItems.slice(0, 3).map((item, i) => (
             <div key={i} className={`${styles.alert} ${styles.alertGreen}`}
               style={{ cursor: 'pointer' }} onClick={() => navigate('/a-receber')}>
-              <HandCoins size={16} />
+              <Coins size={16} />
               <span>A receber: <b>{item.desc}</b> de {item.person} — {formatCurrency(item.amount)} atrasado</span>
             </div>
           ))}
@@ -149,13 +149,13 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
 
       {/* Stat cards */}
       <div className={styles.statGrid}>
-        <StatCard label="Saldo em Bancos" value={formatCurrency(totalBankBalance)} icon={Building2} color="green"
+        <StatCard label="Saldo em Bancos" value={formatCurrency(totalBankBalance)} icon={Building} color="green"
           sub={bankAccounts.length + ' conta(s) cadastrada(s)'} />
         <StatCard label="Receitas" value={formatCurrency(totalIncome)} icon={TrendingUp} color="green" />
         <StatCard label="Gastos" value={formatCurrency(totalExpense)} icon={TrendingDown} color="red" />
         <StatCard label="A Pagar" value={formatCurrency(pendingAmount)} icon={AlertCircle} color="orange"
           sub={`${pendingBills.length} conta(s) pendente(s)`} />
-        <StatCard label="A Receber" value={formatCurrency(recStats.totalToReceive)} icon={HandCoins} color="green"
+        <StatCard label="A Receber" value={formatCurrency(recStats.totalToReceive)} icon={Coins} color="green"
           sub={`${receivables.length} cobrança(s)`} />
         <StatCard label="Parcelas/mês" value={formatCurrency(installMonthly)} icon={CreditCard} color="accent" />
         <StatCard label="Investido" value={formatCurrency(totalInvested)} icon={Wallet} color="blue"
