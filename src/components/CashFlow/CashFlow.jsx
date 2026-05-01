@@ -249,7 +249,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
                 color="#7c5cfc" total={cf.installmentsTotal} count={cf.installments.length} />
               <div className={styles.itemList}>
                 {[...cf.installments].sort((a, b) => a.dueDay - b.dueDay).map(i => (
-                  <ItemRow key={i.id} desc={i.desc} amount={i.monthly}
+                  <ItemRow key={i.id} desc={i.desc} amount={i.amount}
                     sub="Cartão" dueDate={i.dueDate} paid={false} color="#7c5cfc" />
                 ))}
               </div>
