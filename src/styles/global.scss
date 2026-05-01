@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use './variables' as *;
 
 // ─── THEME TOKENS ─────────────────────────────────────────────────────────────
@@ -257,7 +258,7 @@ input, select, textarea { font-family: $font-body; }
   &--primary {
     background: $accent;
     color: white;
-    &:hover { background: color.adjust(#7c5cfc, 8%); box-shadow: 0 4px 16px $accent-glow; }
+    &:hover { background: color.adjust(#7c5cfc, $lightness: 8%); box-shadow: 0 4px 16px $accent-glow; }
   }
 
   &--secondary {
