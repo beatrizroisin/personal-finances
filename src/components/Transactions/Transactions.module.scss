@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+﻿@use '../../styles/variables' as *;
 
 .filters {
   display: flex;
@@ -11,7 +11,7 @@
 .filterGroup {
   display: flex;
   gap: 6px;
-  background: var(--bg-card);;
+  background: $bg-card;;
   border: 1px solid $border;
   border-radius: $radius-sm;
   padding: 4px;
@@ -38,7 +38,7 @@
   align-items: center;
   gap: 20px;
   padding: 16px 20px;
-  background: var(--bg-card);;
+  background: $bg-card;;
   border: 1px solid $border;
   border-radius: $radius-md;
   margin-bottom: 20px;
@@ -73,14 +73,14 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: var(--bg-card);;
+  background: $bg-card;;
   border: 1px solid $border;
   border-radius: $radius-md;
   transition: all $transition;
 
   &:hover {
     border-color: $border-light;
-    background: var(--bg-card)-hover;
+    background: $bg-card-hover;
   }
 }
 

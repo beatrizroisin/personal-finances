@@ -1,4 +1,4 @@
-@use '../../styles/variables.scss' as *;
+﻿@use '../../styles/variables.scss' as *;
 
 .page { }
 
@@ -15,18 +15,18 @@
   font-family: $font-display;
   font-size: 36px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: $text-primary;
   line-height: 1;
 }
 
 .sub {
   font-size: 13px;
-  color: var(--text-muted);
+  color: $text-muted;
   margin-top: 4px;
 }
 
 .balanceChip {
-  background: var(--bg-surface);
+  background: $bg-surface;
   border: 1px solid;
   border-radius: $radius-lg;
   padding: 12px 20px;
@@ -38,7 +38,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: $text-muted;
   margin-bottom: 4px;
 }
 
@@ -107,7 +107,7 @@
   font-family: $font-display;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
   margin-bottom: 20px;
 }
 
@@ -143,14 +143,14 @@
 
 .legendName {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: $text-secondary;
   flex: 1;
 }
 
 .legendVal {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
 }
 
 // ─── CARD USAGE ───────────────────────────────────────────────────────────────
@@ -183,31 +183,31 @@
 
 .cardUsageName {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: $text-secondary;
   flex: 1;
 }
 
 .cardUsagePct {
   font-size: 12px;
-  color: var(--text-muted);
+  color: $text-muted;
 }
 
 .cardUsageVal {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
 }
 
 .cardUsageChart {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid $border;
   padding-top: 20px;
   margin-top: 8px;
 }
 
 // ─── TOOLTIP ─────────────────────────────────────────────────────────────────
 .tooltip {
-  background: var(--bg-surface);
-  border: 1px solid var(--border)-light;
+  background: $bg-surface;
+  border: 1px solid $border-light;
   border-radius: $radius-sm;
   padding: 10px 14px;
   font-size: 12px;
@@ -215,7 +215,7 @@
 }
 
 .tooltipLabel {
-  color: var(--text-muted);
+  color: $text-muted;
   margin-bottom: 4px;
   font-weight: 600;
   font-size: 11px;

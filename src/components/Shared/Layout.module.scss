@@ -1,4 +1,4 @@
-@use '../../styles/variables.scss' as *;
+﻿@use '../../styles/variables.scss' as *;
 
 .wrap {
   display: flex;
@@ -9,8 +9,8 @@
 .sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border);
+  background: $bg-surface;
+  border-right: 1px solid $border;
   display: flex;
   flex-direction: column;
   padding: 28px 16px;
@@ -42,8 +42,8 @@
   width: var(--btn-width);
   height: var(--btn-height);
   border-radius: 20px; 
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
+  border: 1px solid $border;
+  background: $bg-surface;
   cursor: pointer;
   position: relative;
   padding: 0;
@@ -52,7 +52,7 @@
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: var(--text-primary);
+    border-color: $text-primary;
   }
 }
 
@@ -62,7 +62,7 @@
   left: var(--padding);
   width: calc(var(--btn-height) - (var(--padding) * 2));
   height: calc(var(--btn-height) - (var(--padding) * 2));
-  background: var(--text-primary); 
+  background: $text-primary; 
   border-radius: 50%;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   z-index: 1;
@@ -88,7 +88,7 @@
     background: #ff922b; 
   }
   .sunIcon { color: white; }
-  .moonIcon { color: var(--text-muted); }
+  .moonIcon { color: $text-muted; }
 }
 
 
@@ -97,7 +97,7 @@
     transform: translateX(calc(var(--btn-width) - var(--btn-height)));
     background: #7c5cfc; 
   }
-  .sunIcon { color: var(--text-muted); }
+  .sunIcon { color: $text-muted; }
   .moonIcon { color: white; }
 }
 
@@ -126,10 +126,10 @@
     z-index: 95;
     width: 40px;
     height: 40px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border)-light;
+    background: $bg-surface;
+    border: 1px solid $border-light;
     border-radius: $radius-sm;
-    color: var(--text-primary);
+    color: $text-primary;
     box-shadow: $shadow-card;
   }
 }
@@ -160,13 +160,13 @@
   font-family: $font-display;
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: $text-primary;
   line-height: 1;
 }
 
 .logoSub {
   font-size: 11px;
-  color: var(--text-muted);
+  color: $text-muted;
   margin-top: 2px;
 }
 
@@ -184,15 +184,15 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: $radius-sm;
-  color: var(--text-muted);
+  color: $text-muted;
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
   transition: all $transition;
 
   &:hover {
-    background: var(--bg-surface);
-    color: var(--text-primary);
+    background: $bg-surface;
+    color: $text-primary;
   }
 }
 
@@ -210,12 +210,12 @@
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 .sidebarFooter {
   padding: 16px 8px 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid $border;
   margin-top: 24px;
 
   p {
     font-size: 11px;
-    color: var(--text-muted);
+    color: $text-muted;
     line-height: 1.8;
   }
 }
@@ -236,7 +236,7 @@
 .userSection {
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid $border;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -270,7 +270,7 @@
 .userName {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -278,7 +278,7 @@
 
 .userEmail {
   font-size: 11px;
-  color: var(--text-muted);
+  color: $text-muted;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -292,8 +292,8 @@
   padding: 8px 12px;
   border-radius: $radius-sm;
   background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  border: 1px solid $border;
+  color: $text-muted;
   font-family: $font-body;
   font-size: 13px;
   font-weight: 500;
