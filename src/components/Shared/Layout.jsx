@@ -20,7 +20,7 @@ const NAV = [
   { to: '/cartoes',       icon: Wallet,          label: 'Cartões' },
   { to: '/investimentos', icon: TrendingUp,      label: 'Investimentos' },
   { to: '/a-receber',     icon: Coins,       label: 'A Receber' },
-  { to: '/receitas-fixas', icon: RefreshCcw,          label: 'Receitas Fixas' },
+  { to: '/receitas-fixas', icon: TrendingUp,          label: 'Receitas Fixas' },
 ]
 
 export default function Layout({ children }) {

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import {
-  TrendingUp, TrendingDown, RefreshCcw, CreditCard,
+  TrendingUp, TrendingDown, Repeat, CreditCard,
   ArrowLeftRight, ChevronLeft, ChevronRight, Check, Coins,
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
@@ -192,7 +192,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
             })(),
           },
           { label: 'Gastos tx.',   value: cf.txExpenses,        color: '#f03e3e', icon: TrendingDown },
-          { label: 'Contas',       value: cf.billsTotal,        color: '#ff922b', icon: RefreshCcw },
+          { label: 'Contas',       value: cf.billsTotal,        color: '#ff922b', icon: Repeat },
           { label: 'Parcelas',     value: cf.installmentsTotal, color: '#7c5cfc', icon: CreditCard },
           {
             label: 'Saldo prev.',
@@ -221,7 +221,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
         {/* LEFT: Bills + Installments (saídas) */}
         <div className={styles.detailCol}>
           <div className={`card ${styles.detailCard}`}>
-            <SectionHeader icon={RefreshCcw} title="Contas Recorrentes"
+            <SectionHeader icon={Repeat} title="Contas Recorrentes"
               color="#ff922b" total={cf.billsTotal} count={cf.bills.length} />
             {cf.bills.length === 0 ? (
               <p className={styles.emptyMsg}>Nenhuma conta recorrente cadastrada</p>
