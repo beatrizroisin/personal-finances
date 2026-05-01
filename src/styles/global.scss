@@ -257,7 +257,7 @@ input, select, textarea { font-family: $font-body; }
   &--primary {
     background: $accent;
     color: white;
-    &:hover { background: lighten(#7c5cfc, 8%); box-shadow: 0 4px 16px $accent-glow; }
+    &:hover { background: color.adjust(#7c5cfc, 8%); box-shadow: 0 4px 16px $accent-glow; }
   }
 
   &--secondary {
@@ -321,9 +321,9 @@ input, select, textarea { font-family: $font-body; }
   &__fill {
     height: 100%;
     border-radius: 3px;
-    background: linear-gradient(90deg, $accent, lighten(#7c5cfc, 15%));
+    background: linear-gradient(90deg, $accent, color.adjust(#7c5cfc, 15%));
     transition: width $transition-slow;
   }
-  &--green .progress__fill { background: linear-gradient(90deg, $green, lighten(#0ecb81, 15%)); }
-  &--orange .progress__fill { background: linear-gradient(90deg, $orange, lighten(#ff922b, 15%)); }
+  &--green .progress__fill { background: linear-gradient(90deg, $green, color.adjust(#0ecb81, 15%)); }
+  &--orange .progress__fill { background: linear-gradient(90deg, $orange, color.adjust(#ff922b, 15%)); }
 }
