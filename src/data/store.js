@@ -40,6 +40,11 @@ export const SEED_INVESTMENTS = [
   { id: 'inv4', desc: 'Fundo Imobiliário XPML11', amount: 3200, returnPct: 9.3, type: 'FII', startDate: '2026-01-05', institution: 'XP Investimentos' },
 ];
 
+
+export const SEED_RECURRING_INCOMES = [
+  { id: 'ri1', desc: 'Salário', amount: 7500, day: 5,  category: 'Renda', active: true },
+  { id: 'ri2', desc: 'Aluguel recebido', amount: 1200, day: 10, category: 'Renda', active: false },
+];
 // ─── CATEGORIES ───────────────────────────────────────────────────────────────
 export const CATEGORIES = ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Lazer', 'Educação', 'Renda', 'Outros'];
 
@@ -219,6 +224,25 @@ export const BANK_ACCOUNT_OPTIONS = [
   { value: 'outro',     label: 'Outro',     color: '#7c5cfc' },
 ]
 
+
+// ─── CARD BILLING HELPERS ────────────────────────────────────────────────────
+// Returns the billing month "YYYY-MM" for a transaction given the card's closing day.
+// If purchaseDate is on or before closingDay → bills THIS month (statement closes this month)
+// If purchaseDate is after closingDay → bills NEXT month (statement already closed)
+// Example: closingDay=20, purchase on 22nd → next month's bill
+export const getBillingMonth = (purchaseDateStr, closingDay) => {
+  if (!purchaseDateStr || !closingDay) return purchaseDateStr?.slice(0, 7) ?? null;
+  const d = new Date(purchaseDateStr + 'T12:00:00'); // noon avoids timezone issues
+  const day = d.getDate();
+  if (day > closingDay) {
+    // After closing: falls on next month's bill
+    const next = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}`;
+  }
+  // On or before closing: falls on this month's bill
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
+
 // ─── MONTH RESET HELPERS ─────────────────────────────────────────────────────
 // Returns "YYYY-MM" of the current month
 export const currentMonthKey = () => {
@@ -265,7 +289,7 @@ export const getMonthRange = () => {
 
 // Build cashflow for a specific { year, month }
 // Returns { income, expenses, installments, bills, receivables, balance }
-export const buildMonthCashflow = ({ year, month }, transactions, bills, installments, receivables = []) => {
+export const buildMonthCashflow = ({ year, month }, transactions, bills, installments, receivables = [], recurringIncomes = []) => {
   const pad = n => String(n).padStart(2, '0');
   const prefix = `${year}-${pad(month)}`;
 
@@ -288,14 +312,26 @@ export const buildMonthCashflow = ({ year, month }, transactions, bills, install
   const billsTotal = projectedBills.reduce((s, b) => s + b.amount, 0);
 
   // Active expense installments for that month (parcelamentos a PAGAR)
-  const targetDate = new Date(year, month - 1, 1);
+  // Uses noon time to avoid UTC timezone issues with date parsing
+  const targetYear  = year;
+  const targetMonth = month; // 1-based
   const projectedInstallments = installments
     .filter(inst => {
       if (inst.paid >= inst.totalInstallments) return false;
-      const start = new Date(inst.startDate || '2020-01-01');
-      start.setDate(1);
-      const endMonth = new Date(start.getFullYear(), start.getMonth() + inst.totalInstallments - 1, 1);
-      return targetDate >= start && targetDate <= endMonth;
+      const rawStart = inst.startDate || '2026-01-01';
+      // Parse timezone-safe: treat YYYY-MM-DD as local noon
+      const startParts = rawStart.split('-').map(Number); // [y, m, d]
+      const startYear  = startParts[0];
+      const startMonth = startParts[1]; // 1-based
+      // End month (1-based)
+      const totalMonths = inst.totalInstallments;
+      let endYear  = startYear;
+      let endMonth = startMonth + totalMonths - 1;
+      while (endMonth > 12) { endMonth -= 12; endYear++; }
+      // Is targetYear/targetMonth within [start, end]?
+      const afterStart = (targetYear > startYear) || (targetYear === startYear && targetMonth >= startMonth);
+      const beforeEnd  = (targetYear < endYear)  || (targetYear === endYear  && targetMonth <= endMonth);
+      return afterStart && beforeEnd;
     })
     .map(inst => ({
       id: inst.id, desc: inst.desc, amount: inst.monthly,
@@ -341,7 +377,17 @@ export const buildMonthCashflow = ({ year, month }, transactions, bills, install
   });
   const receivablesTotal = projectedReceivables.reduce((s, r) => s + r.amount, 0);
 
-  const totalIncome   = txIncome + receivablesTotal;
+  // Recurring incomes projected for this month (e.g. salary, rent received)
+  const projectedRecurringIncomes = (recurringIncomes || [])
+    .filter(ri => ri.active)
+    .map(ri => ({
+      id: ri.id, desc: ri.desc, amount: ri.amount,
+      day: ri.day, category: ri.category,
+      date: `${year}-${pad(month)}-${pad(ri.day)}`,
+    }));
+  const recurringIncomesTotal = projectedRecurringIncomes.reduce((s, r) => s + r.amount, 0);
+
+  const totalIncome   = txIncome + receivablesTotal + recurringIncomesTotal;
   const totalExpenses = txExpenses + billsTotal + installmentsTotal;
   const balance       = totalIncome - totalExpenses;
 
@@ -352,6 +398,7 @@ export const buildMonthCashflow = ({ year, month }, transactions, bills, install
     bills: projectedBills, billsTotal,
     installments: projectedInstallments, installmentsTotal,
     receivables: projectedReceivables, receivablesTotal,
+    recurringIncomes: projectedRecurringIncomes, recurringIncomesTotal,
     totalIncome, totalExpenses, balance,
   };
 };

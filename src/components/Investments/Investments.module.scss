@@ -1,4 +1,4 @@
-@use '../../styles/variables.scss' as *;
+﻿@use '../../styles/variables.scss' as *;
 
 .summary {
   display: grid;
@@ -8,8 +8,8 @@
 }
 
 .summaryBlock {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: $bg-surface;
+  border: 1px solid $border;
   border-radius: $radius-md;
   padding: 16px;
   display: flex;
@@ -25,13 +25,13 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: $text-muted;
 }
 
 .summaryValue {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: $text-primary;
 }
 
 .projCard {
@@ -42,7 +42,7 @@
   font-family: $font-display;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
   margin-bottom: 16px;
 }
 
@@ -53,8 +53,8 @@
 }
 
 .invCard {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: $bg-surface;
+  border: 1px solid $border;
   border-radius: $radius-lg;
   padding: 20px;
   display: flex;
@@ -87,13 +87,13 @@
 .invDesc {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
   margin-bottom: 2px;
 }
 
 .invInst {
   font-size: 11px;
-  color: var(--text-muted);
+  color: $text-muted;
 }
 
 .invType {
@@ -122,14 +122,14 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: $text-muted;
   margin-bottom: 2px;
 }
 
 .invValBig {
   font-size: 17px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: $text-primary;
 }
 
 .invFooter {
@@ -138,16 +138,16 @@
   gap: 10px;
   flex-wrap: wrap;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid $border;
   font-size: 12px;
 }
 
 .invRate {
-  background: var(--bg-base);
-  border: 1px solid var(--border);
+  background: $bg-base;
+  border: 1px solid $border;
   border-radius: 100px;
   padding: 2px 8px;
-  color: var(--text-secondary);
+  color: $text-secondary;
   font-weight: 600;
 }
 
@@ -157,5 +157,5 @@
 }
 
 .invDate {
-  color: var(--text-muted);
+  color: $text-muted;
 }

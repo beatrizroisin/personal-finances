@@ -11,6 +11,7 @@ import Installments from './components/Installments/Installments'
 import Cards from './components/Cards/Cards'
 import Investments from './components/Investments/Investments'
 import CashFlow from './components/CashFlow/CashFlow'
+import RecurringIncomes from './components/RecurringIncomes/RecurringIncomes'
 import Receivables from './components/Receivables/Receivables'
 import { useFinance } from './hooks/useFinance'
 import './styles/global.scss'
@@ -30,6 +31,7 @@ function AppInner() {
             installments={f.installments}
             investments={f.investments}
             receivables={f.receivables}
+            recurringIncomes={f.recurringIncomes}
           />
         } />
         <Route path="/bancos" element={
@@ -82,6 +84,16 @@ function AppInner() {
             bills={f.bills}
             installments={f.installments}
             receivables={f.receivables}
+            recurringIncomes={f.recurringIncomes}
+          />
+        } />
+        <Route path="/receitas-fixas" element={
+          <RecurringIncomes
+            recurringIncomes={f.recurringIncomes}
+            addRecurringIncome={f.addRecurringIncome}
+            editRecurringIncome={f.editRecurringIncome}
+            toggleRecurringIncome={f.toggleRecurringIncome}
+            removeRecurringIncome={f.removeRecurringIncome}
           />
         } />
         <Route path="*" element={<Navigate to="/" replace />} />

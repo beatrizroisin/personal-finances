@@ -1,18 +1,36 @@
 import { useState } from 'react'
-import { Plus, Trash2, Pencil, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import { Plus, Trash2, Pencil, ArrowUpRight, ArrowDownLeft, Info } from 'lucide-react'
 import Modal from '../Shared/Modal'
-import { formatCurrency, formatDate, CATEGORIES, CATEGORY_COLORS, todayStr } from '../../data/store'
+import { formatCurrency, formatDate, CATEGORIES, CATEGORY_COLORS, todayStr, getBillingMonth } from '../../data/store'
 import styles from './Transactions.module.scss'
 
-const EMPTY_FORM = { desc: '', amount: '', category: 'Alimentação', date: todayStr(), type: 'expense', cardId: '' }
+const EMPTY_FORM = {
+  desc: '', amount: '', category: 'Alimentação', date: todayStr(),
+  purchaseDate: todayStr(), type: 'expense', cardId: '',
+}
 
 export default function Transactions({ transactions, cards, addTransaction, editTransaction, removeTransaction }) {
   const [filter, setFilter]     = useState('all')
   const [catFilter, setCatFilter] = useState('')
-  const [modal, setModal]       = useState(null) // null | { mode: 'add' } | { mode: 'edit', tx }
+  const [modal, setModal]       = useState(null)
 
-  const form = modal?.tx ?? EMPTY_FORM
+  const form    = modal?.tx ?? EMPTY_FORM
   const setForm = (updates) => setModal(prev => ({ ...prev, tx: { ...(prev.tx ?? EMPTY_FORM), ...updates } }))
+
+  // When card or purchaseDate changes, recalculate billingMonth
+  const handleCardOrDateChange = (updates) => {
+    const merged = { ...form, ...updates }
+    if (merged.cardId && merged.purchaseDate) {
+      const card       = cards.find(c => c.id === merged.cardId)
+      const closingDay = card?.closingDay ?? 20
+      const billing    = getBillingMonth(merged.purchaseDate, closingDay)
+      setForm({ ...updates, billingMonth: billing, date: billing + '-01' })
+    } else {
+      // No card: billing = purchase date month
+      const billing = merged.purchaseDate?.slice(0, 7) ?? merged.date?.slice(0, 7)
+      setForm({ ...updates, billingMonth: billing, date: merged.purchaseDate || merged.date })
+    }
+  }
 
   const filtered = transactions
     .filter(t => filter === 'all' || t.type === filter)
@@ -23,20 +41,51 @@ export default function Transactions({ transactions, cards, addTransaction, edit
   const totalOut = filtered.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
 
   const openAdd  = () => setModal({ mode: 'add', tx: { ...EMPTY_FORM } })
-  const openEdit = (tx) => setModal({ mode: 'edit', tx: { ...tx, amount: String(tx.amount), cardId: tx.cardId || '' } })
+  const openEdit = (tx) => setModal({
+    mode: 'edit',
+    tx: {
+      ...tx,
+      amount: String(tx.amount),
+      cardId: tx.cardId || '',
+      purchaseDate: tx.purchaseDate || tx.date,
+      billingMonth: tx.billingMonth || tx.date?.slice(0, 7),
+    },
+  })
 
   const handleSubmit = () => {
     if (!form.desc || !form.amount) return
+    const payload = {
+      ...form,
+      amount: parseFloat(form.amount),
+      cardId: form.cardId || null,
+      purchaseDate: form.purchaseDate || form.date,
+      billingMonth: form.billingMonth || form.date?.slice(0, 7),
+      // date = first day of billing month (used for cashflow grouping)
+      date: form.billingMonth ? form.billingMonth + '-01' : form.date,
+    }
     if (modal.mode === 'add') {
-      addTransaction({ ...form, amount: parseFloat(form.amount), cardId: form.cardId || null })
+      addTransaction(payload)
     } else {
-      editTransaction(form.id, { ...form, cardId: form.cardId || null })
+      editTransaction(form.id, payload)
     }
     setModal(null)
   }
 
   const getCard = (id) => cards.find(c => c.id === id)
   const isEdit  = modal?.mode === 'edit'
+
+  // Billing month label for display
+  const billingLabel = (tx) => {
+    if (!tx.cardId || !tx.billingMonth) return null
+    const bm = tx.billingMonth
+    const [y, m] = bm.split('-')
+    const d = new Date(parseInt(y), parseInt(m) - 1, 1)
+    return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')
+  }
+
+  // Preview for modal: show if billing differs from purchase month
+  const billingDiffersFromPurchase = form.cardId && form.billingMonth &&
+    form.purchaseDate && form.billingMonth !== form.purchaseDate.slice(0, 7)
 
   return (
     <div className="page">
@@ -94,7 +143,8 @@ export default function Transactions({ transactions, cards, addTransaction, edit
             <p>Nenhum lançamento encontrado</p>
           </div>
         ) : filtered.map(t => {
-          const card = t.cardId ? getCard(t.cardId) : null
+          const card  = t.cardId ? getCard(t.cardId) : null
+          const bLabel = billingLabel(t)
           return (
             <div key={t.id} className={`${styles.item} animate-in`}>
               <div className={styles.itemIcon}
@@ -115,7 +165,14 @@ export default function Transactions({ transactions, cards, addTransaction, edit
                       {card.name} ···{card.lastFour}
                     </span>
                   )}
-                  <span className={styles.itemDate}>{formatDate(t.date)}</span>
+                  {bLabel && (
+                    <span className={styles.billingTag} title={`Fatura de ${bLabel}`}>
+                      fatura {bLabel}
+                    </span>
+                  )}
+                  <span className={styles.itemDate}>
+                    compra {formatDate(t.purchaseDate || t.date)}
+                  </span>
                 </div>
               </div>
               <div className={styles.itemRight}>
@@ -135,9 +192,10 @@ export default function Transactions({ transactions, cards, addTransaction, edit
         })}
       </div>
 
-      {/* Modal add/edit */}
+      {/* Modal */}
       {modal && (
         <Modal title={isEdit ? 'Editar Lançamento' : 'Novo Lançamento'} onClose={() => setModal(null)}>
+          {/* Type switch */}
           <div className="form-group">
             <label>Tipo</label>
             <div className={styles.typeSwitch}>
@@ -149,17 +207,19 @@ export default function Transactions({ transactions, cards, addTransaction, edit
                         borderColor: t === 'income' ? '#0ecb81' : '#f03e3e',
                         color: t === 'income' ? '#0ecb81' : '#f03e3e' }
                     : {}}
-                  onClick={() => setForm({ type: t })}>
+                  onClick={() => setForm({ type: t, cardId: t === 'income' ? '' : form.cardId })}>
                   {t === 'expense' ? '↓ Gasto' : '↑ Receita'}
                 </button>
               ))}
             </div>
           </div>
+
           <div className="form-group">
             <label>Descrição</label>
             <input className="form-input" value={form.desc}
               onChange={e => setForm({ desc: e.target.value })} placeholder="Ex: Supermercado" />
           </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Valor (R$)</label>
@@ -167,11 +227,12 @@ export default function Transactions({ transactions, cards, addTransaction, edit
                 onChange={e => setForm({ amount: e.target.value })} placeholder="0,00" />
             </div>
             <div className="form-group">
-              <label>Data</label>
-              <input className="form-input" type="date" value={form.date}
-                onChange={e => setForm({ date: e.target.value })} />
+              <label>Data da compra</label>
+              <input className="form-input" type="date" value={form.purchaseDate || form.date}
+                onChange={e => handleCardOrDateChange({ purchaseDate: e.target.value })} />
             </div>
           </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Categoria</label>
@@ -180,15 +241,35 @@ export default function Transactions({ transactions, cards, addTransaction, edit
                 {CATEGORIES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
-            <div className="form-group">
-              <label>Cartão (opcional)</label>
-              <select className="form-select" value={form.cardId}
-                onChange={e => setForm({ cardId: e.target.value })}>
-                <option value="">Nenhum / Débito</option>
-                {cards.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
+            {form.type === 'expense' && (
+              <div className="form-group">
+                <label>Cartão (opcional)</label>
+                <select className="form-select" value={form.cardId}
+                  onChange={e => handleCardOrDateChange({ cardId: e.target.value })}>
+                  <option value="">Nenhum / Débito/Dinheiro</option>
+                  {cards.map(c => <option key={c.id} value={c.id}>{c.name} (fecha dia {c.closingDay ?? 20})</option>)}
+                </select>
+              </div>
+            )}
           </div>
+
+          {/* Billing month preview */}
+          {form.type === 'expense' && form.cardId && (
+            <div className={`${styles.billingPreview} ${billingDiffersFromPurchase ? styles.billingPreviewWarn : styles.billingPreviewOk}`}>
+              <Info size={14} />
+              {billingDiffersFromPurchase
+                ? <>Compra dia {formatDate(form.purchaseDate)} — cai na <strong>fatura de {
+                    (() => {
+                      const [y, m] = form.billingMonth.split('-')
+                      return new Date(parseInt(y), parseInt(m)-1, 1)
+                        .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+                    })()
+                  }</strong> (após o fechamento do cartão)</>
+                : <>Compra cai na fatura deste mês</>
+              }
+            </div>
+          )}
+
           <div className="form-actions">
             <button className="btn btn--secondary" onClick={() => setModal(null)}>Cancelar</button>
             <button className="btn btn--primary" onClick={handleSubmit}>

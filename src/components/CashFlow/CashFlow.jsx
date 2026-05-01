@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import {
-  TrendingUp, TrendingDown, Repeat2, CreditCard,
-  ArrowLeftRight, ChevronLeft, ChevronRight, Check, HandCoins,
+  TrendingUp, TrendingDown, Repeat, CreditCard,
+  ArrowLeftRight, ChevronLeft, ChevronRight, Check, Coins,
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
 import { formatCurrency, formatDate, getMonthRange, buildMonthCashflow } from '../../data/store'
@@ -62,7 +62,7 @@ function ItemRow({ desc, amount, sub, paid, color, dueDate }) {
 }
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
-export default function CashFlow({ transactions, bills, installments, receivables = [] }) {
+export default function CashFlow({ transactions, bills, installments, receivables = [], recurringIncomes = [] }) {
   const now          = new Date()
   const currentYear  = now.getFullYear()
   const currentMonth = now.getMonth() + 1
@@ -77,7 +77,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
   // Build chart data for every month
   const chartData = useMemo(
     () => allMonths.map(m => {
-      const cf = buildMonthCashflow(m, transactions, bills, installments, receivables)
+      const cf = buildMonthCashflow(m, transactions, bills, installments, receivables, recurringIncomes)
       return {
         key: m.key, label: m.label, longLabel: m.longLabel,
         receita: cf.totalIncome,
@@ -97,7 +97,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
   const selectedMeta = allMonths.find(m => m.key === selectedKey)
   const cf = useMemo(
     () => selectedMeta
-      ? buildMonthCashflow(selectedMeta, transactions, bills, installments, receivables)
+      ? buildMonthCashflow(selectedMeta, transactions, bills, installments, receivables, recurringIncomes)
       : null,
     [selectedMeta, transactions, bills, installments, receivables]
   )
@@ -112,7 +112,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
         <div>
           <h2>Fluxo de Caixa</h2>
           <p className={styles.pageSubtitle}>
-            2026 · {allMonths.length} meses · receitas, contas, parcelas e valores a receber
+            2026 · {allMonths.length} meses · receitas fixas, contas, parcelas e a receber
           </p>
         </div>
       </div>
@@ -184,12 +184,15 @@ export default function CashFlow({ transactions, bills, installments, receivable
             value: cf.totalIncome,
             color: '#0ecb81',
             icon:  TrendingUp,
-            sub:   cf.receivablesTotal > 0
-              ? `Inc. ${formatCurrency(cf.receivablesTotal)} a receber`
-              : undefined,
+            sub:   (() => {
+              const parts = []
+              if (cf.recurringIncomesTotal > 0) parts.push(`${formatCurrency(cf.recurringIncomesTotal)} fixas`)
+              if (cf.receivablesTotal > 0) parts.push(`${formatCurrency(cf.receivablesTotal)} a receber`)
+              return parts.length > 0 ? `Inc. ${parts.join(' + ')}` : undefined
+            })(),
           },
           { label: 'Gastos tx.',   value: cf.txExpenses,        color: '#f03e3e', icon: TrendingDown },
-          { label: 'Contas',       value: cf.billsTotal,        color: '#ff922b', icon: Repeat2 },
+          { label: 'Contas',       value: cf.billsTotal,        color: '#ff922b', icon: Repeat },
           { label: 'Parcelas',     value: cf.installmentsTotal, color: '#7c5cfc', icon: CreditCard },
           {
             label: 'Saldo prev.',
@@ -218,7 +221,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
         {/* LEFT: Bills + Installments (saídas) */}
         <div className={styles.detailCol}>
           <div className={`card ${styles.detailCard}`}>
-            <SectionHeader icon={Repeat2} title="Contas Recorrentes"
+            <SectionHeader icon={Repeat} title="Contas Recorrentes"
               color="#ff922b" total={cf.billsTotal} count={cf.bills.length} />
             {cf.bills.length === 0 ? (
               <p className={styles.emptyMsg}>Nenhuma conta recorrente cadastrada</p>
@@ -246,7 +249,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
                 color="#7c5cfc" total={cf.installmentsTotal} count={cf.installments.length} />
               <div className={styles.itemList}>
                 {[...cf.installments].sort((a, b) => a.dueDay - b.dueDay).map(i => (
-                  <ItemRow key={i.id} desc={i.desc} amount={i.monthly}
+                  <ItemRow key={i.id} desc={i.desc} amount={i.amount}
                     sub="Cartão" dueDate={i.dueDate} paid={false} color="#7c5cfc" />
                 ))}
               </div>
@@ -278,7 +281,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
           {/* A Receber neste mês */}
           {cf.receivables.length > 0 && (
             <div className={`card ${styles.detailCard}`}>
-              <SectionHeader icon={HandCoins} title="A Receber"
+              <SectionHeader icon={Coins} title="A Receber"
                 color="#20c997" total={cf.receivablesTotal} count={cf.receivables.length} />
               <div className={styles.itemList}>
                 {[...cf.receivables].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || '')).map(r => (
@@ -289,6 +292,24 @@ export default function CashFlow({ transactions, bills, installments, receivable
               <div className={styles.sectionFooter}>
                 <span>{cf.receivables.length} parcela(s) prevista(s)</span>
                 <span style={{ color: '#20c997', fontWeight: 700 }}>{formatCurrency(cf.receivablesTotal)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Receitas Fixas projetadas */}
+          {cf.recurringIncomes.length > 0 && (
+            <div className={`card ${styles.detailCard}`}>
+              <SectionHeader icon={TrendingUp} title="Receitas Fixas"
+                color="#0ecb81" total={cf.recurringIncomesTotal} count={cf.recurringIncomes.length} />
+              <div className={styles.itemList}>
+                {[...cf.recurringIncomes].sort((a, b) => a.day - b.day).map(r => (
+                  <ItemRow key={r.id} desc={r.desc} amount={r.amount}
+                    sub={r.category} dueDate={r.date} paid={false} color="#0ecb81" />
+                ))}
+              </div>
+              <div className={styles.sectionFooter}>
+                <span>{cf.recurringIncomes.length} receita(s) fixa(s)</span>
+                <span style={{ color: '#0ecb81', fontWeight: 700 }}>{formatCurrency(cf.recurringIncomesTotal)}</span>
               </div>
             </div>
           )}
@@ -332,6 +353,7 @@ export default function CashFlow({ transactions, bills, installments, receivable
           <p className={styles.balanceExplainFormula}>
             Receitas ({formatCurrency(cf.txIncome)})
             {cf.receivablesTotal > 0 && ` + A Receber (${formatCurrency(cf.receivablesTotal)})`}
+            {cf.recurringIncomesTotal > 0 && ` + Receitas Fixas (${formatCurrency(cf.recurringIncomesTotal)})`}
             {' '}− Gastos ({formatCurrency(cf.txExpenses)})
             {' '}− Contas ({formatCurrency(cf.billsTotal)})
             {' '}− Parcelas ({formatCurrency(cf.installmentsTotal)})

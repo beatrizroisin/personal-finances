@@ -160,3 +160,25 @@ create policy "users_own_balance_history" on public.balance_history
 -- Run this if you already have the bills table created:
 alter table public.bills add column if not exists paid_month text default null;
 -- paid_month stores 'YYYY-MM', used to auto-reset recurring bills each new month
+
+-- ─── ADD closing_day to cards ────────────────────────────────────────────────
+alter table public.cards add column if not exists closing_day integer default 20;
+
+-- ─── ADD purchase_date and billing_month to transactions ─────────────────────
+alter table public.transactions add column if not exists purchase_date text default null;
+alter table public.transactions add column if not exists billing_month text default null;
+
+-- ─── TABELA: recurring_incomes (receitas fixas mensais) ──────────────────────
+create table if not exists public.recurring_incomes (
+  id          text primary key,
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  description text not null,
+  amount      numeric not null,
+  day         integer not null,        -- dia do mês que cai (ex: 5 = dia 5)
+  category    text default 'Renda',
+  active      boolean default true,
+  created_at  timestamptz default now()
+);
+alter table public.recurring_incomes enable row level security;
+create policy "users_own_recurring_incomes" on public.recurring_incomes
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
