@@ -8,16 +8,8 @@ import {
   Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from 'recharts';
 import StatCard from '../Shared/StatCard';
-import { formatCurrency, formatDate, CATEGORY_COLORS, todayDay, calcInvestmentReturn, dueDateStatus } from '../../data/store';
+import { formatCurrency, formatDate, CATEGORY_COLORS, todayDay, calcInvestmentReturn, dueDateStatus, buildMonthCashflow } from '../../data/store';
 import styles from './Dashboard.module.scss';
-
-const MONTHLY_MOCK = [
-  { mes: 'Nov', receita: 6200, gasto: 4100 },
-  { mes: 'Dez', receita: 7000, gasto: 5300 },
-  { mes: 'Jan', receita: 6500, gasto: 3900 },
-  { mes: 'Fev', receita: 6500, gasto: 4200 },
-  { mes: 'Mar', receita: 7100, gasto: 4800 },
-];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -33,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-export default function Dashboard({ bankAccounts = [], cards, transactions, bills, installments, investments, receivables = [] }) {
+export default function Dashboard({ bankAccounts = [], cards, transactions, bills, installments, investments, receivables = [], recurringIncomes = [] }) {
   const navigate = useNavigate();
   const day = todayDay();
 
@@ -49,6 +41,13 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
   const pendingBills   = useMemo(() => bills.filter(b => !b.paid), [bills]);
   const pendingAmount  = pendingBills.reduce((s, b) => s + b.amount, 0);
   const installMonthly = useMemo(() => installments.reduce((s, i) => s + i.monthly, 0), [installments]);
+
+  // ── Saldo previsto do mês (mesmo cálculo do Fluxo de Caixa) ─────────────────
+  const monthProjection = useMemo(() => {
+    const now = new Date();
+    const meta = { year: now.getFullYear(), month: now.getMonth() + 1 };
+    return buildMonthCashflow(meta, transactions, bills, installments, receivables, recurringIncomes);
+  }, [transactions, bills, installments, receivables, recurringIncomes]);
 
   // Receivables summary
   const recStats = useMemo(() => {
@@ -90,9 +89,31 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
     return Object.entries(acc).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [transactions]);
 
-  // Monthly data
-  const currentMonth = { mes: 'Abr', receita: totalIncome, gasto: totalExpense };
-  const monthlyData = [...MONTHLY_MOCK, currentMonth];
+  // Monthly data — last 6 months from real transactions (dynamic, no mock)
+  const monthlyData = useMemo(() => {
+    const now = new Date();
+    const result = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const prefix = `${y}-${m}`;
+      const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      const isCurrentMonth = i === 0;
+
+      const monthTx = transactions.filter(t => {
+        // Use billingMonth if available (credit card), else use date
+        const key = t.billingMonth || t.date?.slice(0, 7);
+        return key === prefix;
+      });
+
+      const receita = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const gasto   = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+
+      result.push({ mes: label, receita, gasto, isCurrent: isCurrentMonth });
+    }
+    return result;
+  }, [transactions]);
 
   // Card usage breakdown
   const cardUsage = useMemo(() => {
@@ -114,11 +135,18 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
           <h1 className={styles.title}>Visão Geral</h1>
           <p className={styles.sub}>{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
         </div>
-        <div className={styles.balanceChip} style={{ borderColor: balance >= 0 ? 'rgba(14,203,129,0.3)' : 'rgba(240,62,62,0.3)' }}>
-          <span className={styles.balanceLabel}>Saldo</span>
-          <span className={styles.balanceValue} style={{ color: balance >= 0 ? '#0ecb81' : '#f03e3e' }}>
-            {formatCurrency(balance)}
-          </span>
+        <div className={styles.balanceChipWrap}>
+          <div className={styles.balanceChip}
+            style={{ borderColor: monthProjection.balance >= 0 ? 'rgba(14,203,129,0.4)' : 'rgba(240,62,62,0.4)' }}>
+            <span className={styles.balanceLabel}>Saldo previsto do mês</span>
+            <span className={styles.balanceValue}
+              style={{ color: monthProjection.balance >= 0 ? '#0ecb81' : '#f03e3e' }}>
+              {formatCurrency(monthProjection.balance)}
+            </span>
+            <span className={styles.balanceSub}>
+              +{formatCurrency(monthProjection.totalIncome)} − {formatCurrency(monthProjection.totalExpenses)}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -146,6 +174,26 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
           ))}
         </div>
       )}
+
+      {/* Saldo previsto destacado */}
+      <div className={styles.projectionBanner}
+        style={{ borderColor: monthProjection.balance >= 0 ? 'rgba(14,203,129,0.3)' : 'rgba(240,62,62,0.3)' }}
+        onClick={() => navigate('/fluxo')} title="Ver Fluxo de Caixa">
+        <div className={styles.projectionLeft}>
+          <p className={styles.projectionLabel}>Saldo previsto de {new Date().toLocaleDateString('pt-BR', { month: 'long' })}</p>
+          <p className={styles.projectionValue}
+            style={{ color: monthProjection.balance >= 0 ? '#0ecb81' : '#f03e3e' }}>
+            {formatCurrency(monthProjection.balance)}
+          </p>
+          <p className={styles.projectionFormula}>
+            Receitas {formatCurrency(monthProjection.totalIncome)}
+            {' '}· Contas {formatCurrency(monthProjection.billsTotal)}
+            {' '}· Parcelas {formatCurrency(monthProjection.installmentsTotal)}
+            {' '}· Gastos {formatCurrency(monthProjection.txExpenses)}
+          </p>
+        </div>
+        <span className={styles.projectionLink}>Ver fluxo completo →</span>
+      </div>
 
       {/* Stat cards */}
       <div className={styles.statGrid}>

@@ -337,3 +337,71 @@
   border-top: 1px solid #1e1e3f;
   margin-top: 4px;
 }
+
+// ─── PROJECTED BALANCE BANNER ─────────────────────────────────────────────────
+.projectionBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--bg-card);
+  border: 1.5px solid;
+  border-radius: 20px;
+  padding: 22px 28px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+}
+
+.projectionLeft { flex: 1; }
+
+.projectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.projectionValue {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.projectionFormula {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.projectionLink {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+
+  .projectionBanner:hover & {
+    color: #0ecb81;
+  }
+}
+
+// ─── BALANCE CHIP WRAP ───────────────────────────────────────────────────────
+.balanceChipWrap { flex-shrink: 0; }
+
+.balanceSub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
