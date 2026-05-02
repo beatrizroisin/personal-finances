@@ -80,17 +80,15 @@ export function FriendsProvider({ children }) {
   // ── Send friend request ────────────────────────────────────────────────────
   const sendFriendRequest = useCallback(async (email) => {
     // Find user by email via profiles
+    // Using maybeSingle() to avoid 406 error when user not found
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('id, name')
-      .eq('email', email)
-      .single()
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
 
-    if (error || !profile) {
-      // Try auth.users lookup via RPC (needs function in DB)
-      // Fallback: search by email in a profiles view
-      return { error: 'Usuário não encontrado. Verifique o e-mail.' }
-    }
+    if (error) return { error: 'Erro ao buscar usuário: ' + error.message }
+    if (!profile) return { error: 'Nenhum usuário encontrado com esse e-mail. Confirme se o amigo já tem conta no app.' }
 
     if (profile.id === user.id) return { error: 'Você não pode se adicionar.' }
 
@@ -123,7 +121,7 @@ export function FriendsProvider({ children }) {
       .from('profiles')
       .select('id, name')
       .eq('email', email.toLowerCase().trim())
-      .single()
+      .maybeSingle()
     if (error || !data) return null
     return data
   }, [])
@@ -136,7 +134,7 @@ export function FriendsProvider({ children }) {
       .eq('id', friendshipId)
 
     // Notify requester that request was accepted
-    const myName = (await supabase.from('profiles').select('name').eq('id', user.id).single()).data?.name
+    const myName = (await supabase.from('profiles').select('name').eq('id', user.id).maybeSingle()).data?.name
     await supabase.from('notifications').insert({
       user_id: fromUserId,
       from_user_id: user.id,
@@ -163,7 +161,7 @@ export function FriendsProvider({ children }) {
 
   // ── Send debt notification ─────────────────────────────────────────────────
   const sendDebtNotification = useCallback(async ({ toUserId, splitDesc, amount, dueDate }) => {
-    const myName = (await supabase.from('profiles').select('name').eq('id', user.id).single()).data?.name
+    const myName = (await supabase.from('profiles').select('name').eq('id', user.id).maybeSingle()).data?.name
     const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
     await supabase.from('notifications').insert({
       user_id: toUserId,
