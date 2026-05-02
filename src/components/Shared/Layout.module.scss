@@ -314,3 +314,50 @@
   gap: 6px;
   flex-shrink: 0;
 }
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-secondary); // Ou uma cor fixa de fundo do switch
+  padding: 4px;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  width: fit-content;
+  user-select: none;
+
+  .toggleThumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px; // Ajuste conforme o tamanho do ícone
+    height: 24px;
+    background: var(--accent-color); // Cor do fundo que desliza
+    border-radius: 50%;
+    transition: transform 0.3s ease; // A mágica da transição
+    z-index: 1;
+  }
+
+  // Quando estiver no modo escuro, o fundo desliza para a direita
+  .toggleThumb.isDark {
+    transform: translateX(28px); // Ajuste a distância conforme necessário
+  }
+
+  .toggleIcon {
+    background: none;
+    border: none;
+    padding: 4px;
+    z-index: 2; // Fica acima do fundo deslizante
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+    cursor: pointer;
+
+    &.active {
+      color: #fff; // Cor do ícone quando selecionado
+    }
+  }
+}
