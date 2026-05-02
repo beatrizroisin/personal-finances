@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  TrendingUp, TrendingDown, Wallet, AlertCircle, CreditCard, Coins, Building
+  TrendingUp, TrendingDown, Wallet, AlertCircle, AlertTriangle, CreditCard, Coins, Building
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -10,6 +10,8 @@ import {
 import StatCard from '../Shared/StatCard';
 import { formatCurrency, formatDate, CATEGORY_COLORS, todayDay, calcInvestmentReturn, dueDateStatus, buildMonthCashflow } from '../../data/store';
 import styles from './Dashboard.module.scss';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -27,7 +29,18 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function Dashboard({ bankAccounts = [], cards, transactions, bills, installments, investments, receivables = [], recurringIncomes = [] }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const day = todayDay();
+  const [sharedDebts, setSharedDebts] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('shared_debts').select('*')
+      .eq('debtor_id', user.id).eq('paid', false)
+      .then(({ data }) => setSharedDebts(data || []));
+  }, [user]);
+
+  const totalOwed = sharedDebts.reduce((s, d) => s + (d.amount || 0), 0);
 
   const totalBankBalance = useMemo(() => bankAccounts.reduce((s, a) => s + (a.balance || 0), 0), [bankAccounts])
   const totalIncome    = useMemo(() => transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0), [transactions]);
@@ -205,6 +218,10 @@ export default function Dashboard({ bankAccounts = [], cards, transactions, bill
           sub={`${pendingBills.length} conta(s) pendente(s)`} />
         <StatCard label="A Receber" value={formatCurrency(recStats.totalToReceive)} icon={Coins} color="green"
           sub={`${receivables.length} cobrança(s)`} />
+        {totalOwed > 0 && (
+          <StatCard label="Devo a amigos" value={formatCurrency(totalOwed)} icon={AlertTriangle} color="red"
+            sub={`${sharedDebts.length} dívida(s) pendente(s)`} />
+        )}
         <StatCard label="Parcelas/mês" value={formatCurrency(installMonthly)} icon={CreditCard} color="accent" />
         <StatCard label="Investido" value={formatCurrency(totalInvested)} icon={Wallet} color="blue"
           sub={`+${formatCurrency(totalReturn)} rendimento est.`} />

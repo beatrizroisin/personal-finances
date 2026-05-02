@@ -505,11 +505,10 @@ function AddSplitModal({ onClose, onSave }) {
   const [form, setForm] = useState({ desc: '', notes: '', splitEqual: true, equalAmount: '' });
   const [people, setPeople] = useState([
     { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null },
-    { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null },
   ]);
 
   const addPerson    = () => setPeople(p => [...p, { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null }]);
-  const removePerson = (id) => { if (people.length > 2) setPeople(p => p.filter(r => r.id !== id)); };
+  const removePerson = (id) => { if (people.length > 1) setPeople(p => p.filter(r => r.id !== id)); };
   const updatePerson = (id, field, value) =>
     setPeople(p => p.map(r => r.id === id ? { ...r, [field]: value } : r));
 
@@ -746,6 +745,16 @@ export default function Receivables({ receivables, addReceivable, removeReceivab
           <span className={styles.summaryLabel}>Total cadastrado</span>
           <span className={styles.summaryValue}>{receivables.length} cobranças</span>
         </div>
+        {sharedDebts.filter(d => !d.paid).length > 0 && (
+          <div className={styles.summaryBlock} style={{ borderColor: 'rgba(240,62,62,0.3)' }}>
+            <span className={styles.summaryLabel}>Devo a amigos</span>
+            <span className={styles.summaryValue} style={{ color: '#f03e3e' }}>
+              {new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(
+                sharedDebts.filter(d=>!d.paid).reduce((s,d)=>s+d.amount,0)
+              )}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
