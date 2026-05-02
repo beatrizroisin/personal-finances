@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFriends } from '../../context/FriendsContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 import {
   Plus, Trash2, Check, Clock, AlertTriangle, ChevronDown, ChevronUp,
   User, Users, Copy, Phone, Banknote, SplitSquareHorizontal, FileDown,
@@ -643,8 +645,38 @@ function AddSplitModal({ onClose, onSave }) {
 export default function Receivables({ receivables, addReceivable, removeReceivable,
   markInstallmentPaid, markPersonPaid, addPersonToSplit }) {
 
-  const [modal, setModal]       = useState(null);
+  const { user } = useAuth();
+  const [modal, setModal]           = useState(null);
   const [filterType, setFilterType] = useState('all');
+  const [sharedDebts, setSharedDebts] = useState([]);
+
+  // Load debts that friends created for me (shared_debts where I am the debtor)
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from('shared_debts')
+        .select('*')
+        .eq('debtor_id', user.id)
+        .order('created_at', { ascending: false });
+      setSharedDebts(data || []);
+    };
+    load();
+
+    // Realtime: update when a new debt arrives
+    const ch = supabase.channel('shared_debts:' + user.id)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'shared_debts',
+        filter: 'debtor_id=eq.' + user.id,
+      }, () => load())
+      .subscribe();
+    return () => supabase.removeChannel(ch);
+  }, [user]);
+
+  const markDebtPaid = async (id) => {
+    await supabase.from('shared_debts').update({ paid: true }).eq('id', id);
+    setSharedDebts(p => p.map(d => d.id === id ? { ...d, paid: true } : d));
+  };
 
   const stats = useMemo(() => {
     let totalReceived = 0, totalPending = 0, overdueCount = 0;
@@ -749,6 +781,66 @@ export default function Receivables({ receivables, addReceivable, removeReceivab
           )
         )}
       </div>
+
+      {/* ── DÍVIDAS RECEBIDAS DE AMIGOS ── */}
+      {sharedDebts.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 700,
+            color: 'var(--text-primary)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16, background: 'rgba(240,62,62,0.1)', color: '#f03e3e',
+              padding: '4px 10px', borderRadius: 100, fontFamily: 'inherit', fontSize: 12, fontWeight: 700 }}>
+              Você deve
+            </span>
+            Dívidas com amigos
+          </h3>
+          <div className={styles.list}>
+            {sharedDebts.map(d => {
+              const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+              return (
+                <div key={d.id} className={styles.recCard}
+                  style={{ borderColor: d.paid ? 'rgba(14,203,129,0.25)' : 'rgba(240,62,62,0.25)', opacity: d.paid ? 0.65 : 1 }}>
+                  <div className={styles.recHeader}>
+                    <div className={styles.recIconWrap} style={{ background: d.paid ? 'rgba(14,203,129,0.1)' : 'rgba(240,62,62,0.1)' }}>
+                      <span style={{ fontSize: 16 }}>{d.paid ? '✓' : '💸'}</span>
+                    </div>
+                    <div className={styles.recMeta}>
+                      <div className={styles.recTitleRow}>
+                        <h4 className={styles.recDesc}
+                          style={{ textDecoration: d.paid ? 'line-through' : 'none' }}>
+                          {d.description}
+                        </h4>
+                        <span className={styles.recType}
+                          style={{ background: d.paid ? 'rgba(14,203,129,0.1)' : 'rgba(240,62,62,0.1)',
+                            color: d.paid ? '#0ecb81' : '#f03e3e' }}>
+                          {d.paid ? 'Pago' : 'Pendente'}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 3 }}>
+                        Cobrado por <strong>{d.creditor_name}</strong>
+                        {d.due_date && ` · vence ${d.due_date}`}
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                      <span style={{ fontSize: 18, fontWeight: 700,
+                        color: d.paid ? 'var(--text-muted)' : '#f03e3e' }}>
+                        {fmt(d.amount)}
+                      </span>
+                      {!d.paid && (
+                        <button className="btn btn--sm"
+                          style={{ background: 'rgba(14,203,129,0.15)', border: '1px solid rgba(14,203,129,0.3)',
+                            color: '#0ecb81', fontSize: 12 }}
+                          onClick={() => markDebtPaid(d.id)}>
+                          ✓ Marquei como pago
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {modal === 'installment' && (
         <AddInstallmentReceivableModal

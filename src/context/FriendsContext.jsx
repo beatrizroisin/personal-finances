@@ -196,16 +196,30 @@ export function FriendsProvider({ children }) {
     await loadAll()
   }, [loadAll])
 
-  // ── Send debt notification ──────────────────────────────────────────────────
+  // ── Send debt notification + create shared debt record ─────────────────────
   const sendDebtNotification = useCallback(async ({ toUserId, splitDesc, amount, dueDate }) => {
     const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
+
+    // 1. Send notification
     await supabase.from('notifications').insert({
       user_id:      toUserId,
       from_user_id: user.id,
       type:         'debt_created',
       title:        `Você deve ${fmt(amount)}`,
-      message:      `${myName} te incluiu no "${splitDesc}" — ${fmt(amount)}${dueDate ? ` até ${dueDate}` : ''}.`,
-      data:         { amount, splitDesc, dueDate },
+      message:      `${myName} te incluiu no "${splitDesc}" — ${fmt(amount)}${dueDate ? ` até ${dueDate}` : ''}. Acesse A Receber para ver.`,
+      data:         { amount, splitDesc, dueDate, fromUserId: user.id, fromName: myName },
+    })
+
+    // 2. Create a shared debt record visible to the friend
+    // Uses open INSERT policy so we can write to friend's debt list
+    await supabase.from('shared_debts').insert({
+      debtor_id:    toUserId,       // who owes
+      creditor_id:  user.id,        // who is owed (me)
+      creditor_name: myName,
+      description:  splitDesc,
+      amount:       amount,
+      due_date:     dueDate || null,
+      paid:         false,
     })
   }, [user, myName])
 

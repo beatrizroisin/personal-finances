@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bell, Check, UserPlus, UserCheck, DollarSign, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Bell, Check, UserPlus, UserCheck, DollarSign } from 'lucide-react'
 import { useFriends } from '../../context/FriendsContext'
 import styles from './NotificationsBell.module.scss'
 
 const TYPE_CONFIG = {
-  friend_request: { icon: UserPlus,   color: '#7c5cfc', label: 'Pedido de amizade' },
-  friend_accepted: { icon: UserCheck, color: '#0ecb81', label: 'Amizade aceita' },
-  debt_created:   { icon: DollarSign, color: '#ff922b', label: 'Nova dívida' },
+  friend_request:  { icon: UserPlus,   color: '#7c5cfc', route: '/amigos' },
+  friend_accepted: { icon: UserCheck,  color: '#0ecb81', route: '/amigos' },
+  debt_created:    { icon: DollarSign, color: '#ff922b', route: '/a-receber' },
 }
 
 function timeAgo(dateStr) {
@@ -23,25 +24,24 @@ export default function NotificationsBell() {
   const { notifications, unreadCount, markAllRead, markOneRead } = useFriends()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+  const navigate = useNavigate()
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const handleOpen = () => {
-    setOpen(prev => !prev)
-  }
-
-  const handleMarkAll = async () => {
-    await markAllRead()
+  const handleClick = async (n) => {
+    await markOneRead(n.id)
+    const cfg = TYPE_CONFIG[n.type] || TYPE_CONFIG.debt_created
+    navigate(cfg.route)
+    setOpen(false)
   }
 
   return (
     <div className={styles.wrap} ref={ref}>
-      <button className={styles.bell} onClick={handleOpen} title="Notificações">
+      <button className={styles.bell} onClick={() => setOpen(p => !p)} title="Notificações">
         <Bell size={16} />
         {unreadCount > 0 && (
           <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
@@ -53,7 +53,7 @@ export default function NotificationsBell() {
           <div className={styles.dropHeader}>
             <h4>Notificações</h4>
             {unreadCount > 0 && (
-              <button className={styles.markAllBtn} onClick={handleMarkAll}>
+              <button className={styles.markAllBtn} onClick={markAllRead}>
                 <Check size={12} /> Marcar todas como lidas
               </button>
             )}
@@ -71,7 +71,8 @@ export default function NotificationsBell() {
               return (
                 <div key={n.id}
                   className={`${styles.notifRow} ${!n.read ? styles.notifUnread : ''}`}
-                  onClick={() => markOneRead(n.id)}>
+                  onClick={() => handleClick(n)}
+                  title="Clique para ver detalhes">
                   <div className={styles.notifIcon} style={{ background: `${cfg.color}18` }}>
                     <Icon size={14} color={cfg.color} />
                   </div>
