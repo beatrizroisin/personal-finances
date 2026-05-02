@@ -17,7 +17,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+z-index: 999;
 
   @media (max-width: 768px) {
     position: fixed;
@@ -330,10 +330,10 @@
   .toggleThumb {
     position: absolute;
     top: 4px;
-    left: 4px;
-    width: 24px; // Ajuste conforme o tamanho do ícone
+left: 1px;
+    width: 24px;
     height: 24px;
-    background: var(--accent-color); // Cor do fundo que desliza
+    background: #000;
     border-radius: 50%;
     transition: transform 0.3s ease; // A mágica da transição
     z-index: 1;
