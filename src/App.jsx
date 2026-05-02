@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import { FriendsProvider } from './context/FriendsContext'
 import AuthPage from './components/Auth/AuthPage'
 import LoadingScreen from './components/Auth/LoadingScreen'
 import Layout from './components/Shared/Layout'
@@ -12,11 +13,13 @@ import Cards from './components/Cards/Cards'
 import Investments from './components/Investments/Investments'
 import CashFlow from './components/CashFlow/CashFlow'
 import RecurringIncomes from './components/RecurringIncomes/RecurringIncomes'
-import Friends from './components/Friends/Friends'
 import Receivables from './components/Receivables/Receivables'
+import Friends from './components/Friends/Friends'
 import { useFinance } from './hooks/useFinance'
 import './styles/global.scss'
 
+// AppInner only renders when the user is authenticated
+// FriendsProvider lives here so useAuth() is already available
 function AppInner() {
   const f = useFinance()
   if (f.loading) return <LoadingScreen message="Carregando seus dados..." />
@@ -104,12 +107,16 @@ function AppInner() {
   )
 }
 
+// Root App — wraps authenticated section with FriendsProvider
 export default function App() {
   const { user, loading } = useAuth()
   if (loading) return <LoadingScreen message="Verificando sessão..." />
   return (
     <BrowserRouter>
-      {user ? <AppInner /> : <AuthPage />}
+      {user
+        ? <FriendsProvider><AppInner /></FriendsProvider>
+        : <AuthPage />
+      }
     </BrowserRouter>
   )
 }
