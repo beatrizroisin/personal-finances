@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useFriends } from '../../context/FriendsContext';
 import {
   Plus, Trash2, Check, Clock, AlertTriangle, ChevronDown, ChevronUp,
   User, Users, Copy, Phone, Banknote, SplitSquareHorizontal, FileDown,
@@ -498,22 +499,31 @@ function AddInstallmentReceivableModal({ onClose, onSave }) {
 
 // ─── ADD SPLIT MODAL ──────────────────────────────────────────────────────────
 function AddSplitModal({ onClose, onSave }) {
+  const { friends, sendDebtNotification } = useFriends();
   const [form, setForm] = useState({ desc: '', notes: '', splitEqual: true, equalAmount: '' });
   const [people, setPeople] = useState([
-    { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() },
-    { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() },
+    { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null },
+    { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null },
   ]);
 
-  const addPerson    = () => setPeople(p => [...p, { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr() }]);
+  const addPerson    = () => setPeople(p => [...p, { id: generateId(), name: '', phone: '', pix: '', amount: '', dueDate: todayStr(), friendId: null }]);
   const removePerson = (id) => { if (people.length > 2) setPeople(p => p.filter(r => r.id !== id)); };
   const updatePerson = (id, field, value) =>
     setPeople(p => p.map(r => r.id === id ? { ...r, [field]: value } : r));
+
+  // When a friend is selected, auto-fill name
+  const selectFriend = (personId, friend) => {
+    setPeople(p => p.map(r => r.id === personId
+      ? { ...r, name: friend.friendName || r.name, friendId: friend.friendId }
+      : r
+    ));
+  };
 
   const totalAmount = form.splitEqual
     ? (parseFloat(form.equalAmount) || 0) * people.length
     : people.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.desc || people.some(p => !p.name)) return;
     const finalPeople = people.map(p => ({
       ...p,
@@ -521,6 +531,18 @@ function AddSplitModal({ onClose, onSave }) {
       paid: false, paidDate: null,
     }));
     onSave({ type: 'split', desc: form.desc, notes: form.notes, totalAmount, people: finalPeople });
+
+    // Send notifications to friends who are connected
+    for (const p of finalPeople) {
+      if (p.friendId) {
+        await sendDebtNotification({
+          toUserId: p.friendId,
+          splitDesc: form.desc,
+          amount: p.amount,
+          dueDate: p.dueDate,
+        });
+      }
+    }
   };
 
   return (
@@ -556,6 +578,23 @@ function AddSplitModal({ onClose, onSave }) {
           <div key={person.id} className={styles.personEditorRow}>
             <div className={styles.personEditorAvatar}>{idx + 1}</div>
             <div className={styles.personEditorFields}>
+              {/* Friend selector — if user has friends, show picker */}
+              {friends.length > 0 && (
+                <div style={{ marginBottom: 6 }}>
+                  <select className="form-select"
+                    value={person.friendId || ''}
+                    onChange={e => {
+                      const f = friends.find(fr => fr.friendId === e.target.value);
+                      if (f) selectFriend(person.id, f);
+                      else updatePerson(person.id, 'friendId', null);
+                    }}>
+                    <option value="">Selecionar amigo (opcional)</option>
+                    {friends.map(f => (
+                      <option key={f.friendId} value={f.friendId}>{f.friendName}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <input className="form-input" placeholder="Nome *" value={person.name}
                 onChange={e => updatePerson(person.id, 'name', e.target.value)} />
               <div className={styles.personEditorSub}>

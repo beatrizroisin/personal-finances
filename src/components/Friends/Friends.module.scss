@@ -1,0 +1,224 @@
+@use '../../styles/variables' as *;
+
+// ─── ADD CARD ─────────────────────────────────────────────────────────────────
+.addCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.addCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+
+  h3 {
+    font-family: $font-display;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+}
+
+.addCardDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.searchForm {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 500px) { flex-direction: column; }
+}
+
+.searchInputWrap {
+  flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.searchInput {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: $radius-sm;
+  padding: 10px 14px 10px 36px;
+  color: var(--text-primary);
+  font-family: $font-body;
+  font-size: 14px;
+  outline: none;
+  transition: border-color $transition, box-shadow $transition;
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+  &::placeholder { color: var(--text-muted); }
+}
+
+.searchMsg {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-sm;
+  padding: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: $font-body;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all $transition;
+  &:hover { color: var(--text-primary); }
+}
+
+.tabActive {
+  background: $accent;
+  color: white;
+}
+
+.tabBadge {
+  padding: 1px 7px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+// ─── LIST ─────────────────────────────────────────────────────────────────────
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friendRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  transition: all $transition;
+
+  &:hover { border-color: var(--border-light); }
+}
+
+.avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.friendInfo { flex: 1; min-width: 0; }
+
+.friendName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.friendSub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.friendActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.acceptBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: $radius-sm;
+  background: $green-soft;
+  border: 1px solid rgba(14,203,129,0.25);
+  color: $green;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover { background: $green; color: white; }
+}
+
+.declineBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: $radius-sm;
+  background: $red-soft;
+  border: 1px solid rgba(240,62,62,0.2);
+  color: $red;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover { background: $red; color: white; }
+}
+
+.pendingTag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(136,136,187,0.1);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}

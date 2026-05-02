@@ -2,33 +2,35 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, ArrowLeftRight, BellRing, CreditCard,
   TrendingUp, Wallet, Coins, Building, Calendar,
-  Menu, X, LogOut, Sun, Moon,
+  Menu, X, LogOut, Sun, Moon, Users,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { signOut } from '../../lib/supabase'
+import NotificationsBell from '../Notifications/NotificationsBell'
 import styles from './Layout.module.scss'
 
 const NAV = [
   { to: '/',              icon: LayoutDashboard, label: 'Visão Geral' },
-  { to: '/bancos',        icon: Building,       label: 'Bancos' },
-  { to: '/fluxo',         icon: Calendar,    label: 'Fluxo de Caixa' },
+  { to: '/bancos',        icon: Building,        label: 'Bancos' },
+  { to: '/fluxo',         icon: Calendar,        label: 'Fluxo de Caixa' },
   { to: '/lancamentos',   icon: ArrowLeftRight,  label: 'Lançamentos' },
   { to: '/contas',        icon: BellRing,        label: 'Contas a Pagar' },
   { to: '/parcelas',      icon: CreditCard,      label: 'Parcelas' },
   { to: '/cartoes',       icon: Wallet,          label: 'Cartões' },
   { to: '/investimentos', icon: TrendingUp,      label: 'Investimentos' },
-  { to: '/a-receber',     icon: Coins,       label: 'A Receber' },
-  { to: '/receitas-fixas', icon: TrendingUp,          label: 'Receitas Fixas' },
+  { to: '/a-receber',     icon: Coins,           label: 'A Receber' },
+  { to: '/receitas-fixas',icon: TrendingUp,      label: 'Receitas Fixas' },
+  { to: '/amigos',        icon: Users,           label: 'Amigos' },
 ]
 
 export default function Layout({ children }) {
-  const [open, setOpen]       = useState(false)
-  const { user, profile }     = useAuth()
-  const { isDark, toggle }    = useTheme()
-  const displayName           = profile?.name || user?.email?.split('@')[0] || 'Usuário'
-  const initials              = displayName.slice(0, 2).toUpperCase()
+  const [open, setOpen]    = useState(false)
+  const { user, profile }  = useAuth()
+  const { isDark, toggle } = useTheme()
+  const displayName        = profile?.name || user?.email?.split('@')[0] || 'Usuário'
+  const initials           = displayName.slice(0, 2).toUpperCase()
 
   return (
     <div className={styles.wrap}>
@@ -37,7 +39,7 @@ export default function Layout({ children }) {
       </button>
 
       <aside className={`${styles.sidebar} ${open ? styles.sidebarOpen : ''}`}>
-        {/* Logo + theme toggle */}
+        {/* Logo + theme toggle + bell */}
         <div className={styles.logoRow}>
           <div className={styles.logo}>
             <span className={styles.logoIcon}>₢</span>
@@ -46,9 +48,12 @@ export default function Layout({ children }) {
               <p className={styles.logoSub}>Painel Pessoal</p>
             </div>
           </div>
-          <button className={styles.themeBtn} onClick={toggle} title={isDark ? 'Modo claro' : 'Modo escuro'}>
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
+          <div className={styles.logoActions}>
+            <NotificationsBell />
+            <button className={styles.themeBtn} onClick={toggle} title={isDark ? 'Modo claro' : 'Modo escuro'}>
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+          </div>
         </div>
 
         <nav className={styles.nav}>
@@ -78,7 +83,6 @@ export default function Layout({ children }) {
       </aside>
 
       {open && <div className={styles.overlay} onClick={() => setOpen(false)} />}
-
       <main className={styles.main}>{children}</main>
     </div>
   )

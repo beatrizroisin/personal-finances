@@ -12,6 +12,7 @@ import Cards from './components/Cards/Cards'
 import Investments from './components/Investments/Investments'
 import CashFlow from './components/CashFlow/CashFlow'
 import RecurringIncomes from './components/RecurringIncomes/RecurringIncomes'
+import Friends from './components/Friends/Friends'
 import Receivables from './components/Receivables/Receivables'
 import { useFinance } from './hooks/useFinance'
 import './styles/global.scss'
@@ -96,6 +97,7 @@ function AppInner() {
             removeRecurringIncome={f.removeRecurringIncome}
           />
         } />
+        <Route path="/amigos" element={<Friends />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

@@ -182,3 +182,67 @@ create table if not exists public.recurring_incomes (
 alter table public.recurring_incomes enable row level security;
 create policy "users_own_recurring_incomes" on public.recurring_incomes
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- ─── TABELA: friendships ──────────────────────────────────────────────────────
+create table if not exists public.friendships (
+  id            text primary key default gen_random_uuid()::text,
+  requester_id  uuid not null references auth.users(id) on delete cascade,
+  addressee_id  uuid not null references auth.users(id) on delete cascade,
+  status        text not null default 'pending'
+                  check (status in ('pending','accepted','declined')),
+  created_at    timestamptz default now(),
+  unique(requester_id, addressee_id)
+);
+alter table public.friendships enable row level security;
+create policy "users_own_friendships" on public.friendships
+  for all using (auth.uid() = requester_id or auth.uid() = addressee_id)
+  with check (auth.uid() = requester_id);
+
+-- ─── TABELA: notifications ────────────────────────────────────────────────────
+create table if not exists public.notifications (
+  id            text primary key default gen_random_uuid()::text,
+  user_id       uuid not null references auth.users(id) on delete cascade,
+  from_user_id  uuid references auth.users(id) on delete set null,
+  type          text not null,
+  title         text not null,
+  message       text not null,
+  data          jsonb default '{}',
+  read          boolean default false,
+  created_at    timestamptz default now()
+);
+alter table public.notifications enable row level security;
+create policy "users_own_notifications" on public.notifications
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ─── VIEW: friends_with_profiles ─────────────────────────────────────────────
+-- Returns accepted friends with their profile info
+create or replace view public.friends_with_profiles as
+  select
+    f.id as friendship_id,
+    f.status,
+    f.created_at,
+    case
+      when f.requester_id = auth.uid() then f.addressee_id
+      else f.requester_id
+    end as friend_id,
+    p.name as friend_name,
+    p.avatar_url as friend_avatar
+  from public.friendships f
+  join public.profiles p on p.id = (
+    case when f.requester_id = auth.uid() then f.addressee_id else f.requester_id end
+  )
+  where (f.requester_id = auth.uid() or f.addressee_id = auth.uid());
+
+-- ─── ADD email to profiles table ─────────────────────────────────────────────
+-- Needed so users can be found by email
+alter table public.profiles add column if not exists email text;
+
+-- Update trigger to also save email
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer as $$
+begin
+  insert into public.profiles (id, name, email)
+  values (new.id, new.raw_user_meta_data->>'name', new.email)
+  on conflict (id) do update set email = excluded.email;
+  return new;
+end;
+$$;
